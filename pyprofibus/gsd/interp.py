@@ -12,7 +12,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from pyprofibus.compat import *
 
 from pyprofibus.gsd.parser import GsdParser, GsdError
-from pyprofibus.dp import DpCfgDataElement
+from pyprofibus.dp.dp import DpCfgDataElement
 
 import difflib
 

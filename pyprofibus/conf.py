@@ -80,7 +80,7 @@ class PbConf(object):
 		def makeDpSlaveDesc(self):
 			"""Create a DpSlaveDesc instance based on the configuration.
 			"""
-			from pyprofibus.dp_master import DpSlaveDesc
+			from pyprofibus.master.dp_master import DpSlaveDesc
 			slaveDesc = DpSlaveDesc(self)
 
 			# Create Chk_Cfg telegram
@@ -247,12 +247,12 @@ class PbConf(object):
 		"""
 		phyType = self.phyType.lower().strip()
 		if phyType == "serial":
-			import pyprofibus.phy_serial
-			phyClass = pyprofibus.phy_serial.CpPhySerial
+			import pyprofibus.phy.phy_serial
+			phyClass = pyprofibus.phy.phy_serial.CpPhySerial
 			extraKwArgs = {}
 		elif phyType in {"dummyslave", "dummy_slave", "dummy-slave"}:
-			import pyprofibus.phy_dummy
-			phyClass = pyprofibus.phy_dummy.CpPhyDummySlave
+			import pyprofibus.phy.phy_dummy
+			phyClass = pyprofibus.phy.phy_dummy.CpPhyDummySlave
 			extraKwArgs = {
 				"echoDX"	: all(slaveConf.outputSize > 0
 						      for slaveConf in self.slaveConfs),
@@ -260,8 +260,8 @@ class PbConf(object):
 						      for slaveConf in self.slaveConfs),
 			}
 		elif phyType == "fpga":
-			import pyprofibus.phy_fpga
-			phyClass = pyprofibus.phy_fpga.CpPhyFPGA
+			import pyprofibus.phy.phy_fpga
+			phyClass = pyprofibus.phy.phy_fpga.CpPhyFPGA
 			extraKwArgs = {}
 		else:
 			raise PbConfError("Invalid phyType parameter value: "
@@ -286,7 +286,7 @@ class PbConf(object):
 			phy = self.makePhy()
 
 		# Create a DP class 1 or 2 master.
-		from pyprofibus.dp_master import DPM1, DPM2
+		from pyprofibus.master.dp_master import DPM1, DPM2
 		if self.dpMasterClass == 1:
 			DpMasterClass = DPM1
 		elif self.dpMasterClass == 2:

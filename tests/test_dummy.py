@@ -4,15 +4,15 @@ initTest(__file__)
 
 import pyprofibus
 import pyprofibus.conf
-import pyprofibus.dp
-import pyprofibus.dp_master
-import pyprofibus.phy_dummy
-import pyprofibus.phy_serial
+import pyprofibus.dp.dp
+import pyprofibus.master.dp_master
+import pyprofibus.physical.phy_dummy
+import pyprofibus.physical.phy_serial
 
 
 class Test_DummyPhy(TestCase):
 	def test_dummy_phy(self):
-		phy = pyprofibus.phy_dummy.CpPhyDummySlave(debug=True, echoDX=True)
+		phy = pyprofibus.phy.phy_dummy.CpPhyDummySlave(debug=True, echoDX=True)
 		phy.setConfig(baudrate=19200)
 
 		master = pyprofibus.DPM1(phy=phy,
@@ -24,11 +24,11 @@ class Test_DummyPhy(TestCase):
 		conf.inputSize = 1
 		conf.outputSize = 1
 		conf.diagPeriod = 0
-		slaveDesc = pyprofibus.dp_master.DpSlaveDesc(conf)
+		slaveDesc = pyprofibus.master.dp_master.DpSlaveDesc(conf)
 
 		slaveDesc.setCfgDataElements([
-			pyprofibus.dp.DpCfgDataElement(pyprofibus.dp.DpCfgDataElement.ID_TYPE_OUT),
-			pyprofibus.dp.DpCfgDataElement(pyprofibus.dp.DpCfgDataElement.ID_TYPE_IN),
+			pyprofibus.dp.dp.DpCfgDataElement(pyprofibus.dp.dp.DpCfgDataElement.ID_TYPE_OUT),
+			pyprofibus.dp.dp.DpCfgDataElement(pyprofibus.dp.dp.DpCfgDataElement.ID_TYPE_IN),
 		])
 
 		slaveDesc.setUserPrmData(bytearray([1, 2, 3, 4, ]))

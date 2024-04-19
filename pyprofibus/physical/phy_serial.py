@@ -11,8 +11,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
-from pyprofibus.phy import *
-from pyprofibus.fdl import FdlTelegram
+from pyprofibus.physical.phy import *
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.util import *
 
 import sys

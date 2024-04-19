@@ -11,7 +11,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
-from pyprofibus.phy import PhyError
+from pyprofibus.physical.phy import PhyError
 
 
 __all__ = [

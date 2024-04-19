@@ -11,9 +11,9 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
-from pyprofibus.phy import *
-from pyprofibus.fdl import *
-from pyprofibus.dp import *
+from pyprofibus.physical.phy import *
+from pyprofibus.fieldbus_data_link.fdl import *
+from pyprofibus.dp.dp import *
 from pyprofibus.phy_fpga_driver import *
 
 from collections import deque
