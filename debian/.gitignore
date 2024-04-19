@@ -1,0 +1,11 @@
+/destdir-*/
+/gsdparser/
+/profisniff/
+/python-pyprofibus*/
+/python3-pyprofibus*/
+
+/debhelper-build-stamp
+/files
+*.debhelper
+*.log
+*.substvars

@@ -1,0 +1,18 @@
+graft debian
+graft doc
+graft examples
+graft micropython
+graft misc
+graft phy_fpga
+graft stublibs
+graft tests
+
+include COPYING
+include README.html
+include README.md
+include README.rst
+
+prune ./build
+prune build
+
+global-exclude *.pyo *.pyc __pycache__ *$py.class
