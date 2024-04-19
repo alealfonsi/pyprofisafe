@@ -15,7 +15,9 @@ import time
 import sys
 from collections import deque
 
+from pyprofibus.physical.phy_interface import CpPhyInterface
 from pyprofibus.util import *
+from abc import ABC, abstractmethod
 
 
 __all__ = [
@@ -28,7 +30,7 @@ class PhyError(ProfibusError):
 	"""PHY exception.
 	"""
 
-class CpPhy(object):
+class CpPhy(CpPhyInterface):
 	"""PROFIBUS CP PHYsical layer base class.
 	"""
 
@@ -77,20 +79,13 @@ class CpPhy(object):
 		self.__allocUntil = monotonic_time()
 		self.__secPerFrame = 0.0
 
+	@abstractmethod
 	def sendData(self, telegramData, srd):
-		"""Send data to the physical line.
-		Reimplement this method in the PHY driver.
-		"""
-		raise NotImplementedError
+		pass
 
+	@abstractmethod
 	def pollData(self, timeout):
-		"""Poll received data from the physical line.
-		timeout => timeout in seconds.
-			   0.0 = no timeout, return immediately.
-			   negative = unlimited.
-		Reimplement this method in the PHY driver.
-		"""
-		raise NotImplementedError
+		pass
 
 	def poll(self, timeout=0.0):
 		"""timeout => timeout in seconds.
