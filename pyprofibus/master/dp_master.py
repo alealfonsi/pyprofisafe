@@ -13,6 +13,9 @@ from pyprofibus.compat import *
 
 from pyprofibus.fieldbus_data_link.fdl import *
 from pyprofibus.dp.dp import *
+from pyprofibus.master.DpMasterInterface import DpMasterInterface
+from pyprofibus.master.DpSlaveDescInterface import DpSlaveDescInterface
+from pyprofibus.master.DpSlaveStateInterface import DpSlaveStateInterface
 from pyprofibus.util import *
 
 import gc
@@ -24,7 +27,7 @@ __all__ = [
 	"DPM2",
 ]
 
-class DpSlaveState(object):
+class DpSlaveState(DpSlaveStateInterface):
 	"""Run time state of a DP slave that is managed by a DPM instance.
 	"""
 
@@ -157,7 +160,7 @@ class DpSlaveState(object):
 	def stateHasTimeout(self):
 		return self.__stateTimeout.exceed()
 
-class DpSlaveDesc(object):
+class DpSlaveDesc(DpSlaveDescInterface):
 	"""Static descriptor data of a DP slave that
 	is managed by a DPM instance.
 	"""
@@ -304,7 +307,7 @@ class DpSlaveDesc(object):
 		return "DpSlaveDesc(identNumber=%s, slaveAddr=%d)" %\
 			(intToHex(self.identNumber), self.slaveAddr)
 
-class DpMaster(object):
+class DpMaster(DpMasterInterface):
 	__slots__ = (
 		"__runTimer",
 		"__runCount",
