@@ -11,6 +11,9 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
+from pyprofibus.fieldbus_data_link.FdlFieldCheckBitInterface import FdlFieldCheckBitInterface
+from pyprofibus.fieldbus_data_link.FdlTelegramInterface import FdlTelegramInterface
+from pyprofibus.fieldbus_data_link.FdlTransceiverInterface import FdlTransceiverInterface
 from pyprofibus.physical.phy import *
 from pyprofibus.util import *
 
@@ -34,7 +37,7 @@ class FdlError(ProfibusError):
 	__slots__ = (
 	)
 
-class FdlFCB():
+class FdlFCB(FdlFieldCheckBitInterface):
 	"""FCB context, per slave.
 	"""
 
@@ -85,7 +88,7 @@ class FdlFCB():
 			self.__fcv,
 			str(self.__fcbWaitingReply)))
 
-class FdlTransceiver(object):
+class FdlTransceiver(FdlTransceiverInterface):
 	__slots__ = (
 		"phy",
 		"__rxFilter",
@@ -141,7 +144,7 @@ class FdlTransceiver(object):
 					fcb.FCBnext()
 		self.phy.send(telegram, srd)
 
-class FdlTelegram(object):
+class FdlTelegram(FdlTelegramInterface):
 	# Start delimiter
 	SD1		= 0x10	# No DU
 	SD2		= 0x68	# Variable DU

@@ -11,6 +11,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
+from pyprofibus.dp.DpTelegramInterface import DpTelegramInterface
+from pyprofibus.dp.DpTransceiverInterface import DpTransceiverInterface
 from pyprofibus.fieldbus_data_link.fdl import *
 from pyprofibus.util import *
 
@@ -34,7 +36,7 @@ class DpError(ProfibusError):
 	__slots__ = (
 	)
 
-class DpTransceiver(object):
+class DpTransceiver(DpTransceiverInterface):
 	__slots__ = (
 		"fdlTrans",
 		"thisIsMaster",
@@ -64,7 +66,7 @@ class DpTransceiver(object):
 	def send(self, fcb, telegram):
 		self.fdlTrans.send(fcb, telegram.toFdlTelegram())
 
-class DpTelegram(object):
+class DpTelegram(DpTelegramInterface):
 	# Source Service Access Point number
 	SSAP_MS2		= 50	# DPM2 to slave
 	SSAP_MS1		= 51	# DPM1 to slave
