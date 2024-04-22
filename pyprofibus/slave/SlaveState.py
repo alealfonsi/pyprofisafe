@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pyprofibus.slave.Slave import Slave
+from pyprofibus.util import TimeLimit
 
 class SlaveState(ABC):
 
@@ -14,7 +15,7 @@ class SlaveState(ABC):
 
     @abstractmethod
     def setParameters(slave: Slave,
-                watchdog,
+                watchdog_ms: int,
                 slave_reaction_time: int, 
                 freeze_mode_enable: bool,
                 locked: bool, 

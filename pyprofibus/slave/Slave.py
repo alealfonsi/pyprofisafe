@@ -1,6 +1,6 @@
 from pyprofibus.slave.SlaveInterface import SlaveInterface
 from pyprofibus.slave.SlaveState import SlaveState
-from pyprofibus.util import ProfibusError
+from pyprofibus.util import ProfibusError, TimeLimit
 
 class Slave(SlaveInterface):
     
@@ -20,8 +20,8 @@ class Slave(SlaveInterface):
     def setState(self, state: SlaveState):
         self.__state = state
 
-    def setParameters(self, watchdog, slave_reaction_time: int, freeze_mode_enable: bool, locked: bool, group, master_add: int, id: int):
-        self.__state.setParameters(self, watchdog, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
+    def setParameters(self, watchdog_ms: int, slave_reaction_time: int, freeze_mode_enable: bool, locked: bool, group, master_add: int, id: int):
+        self.__state.setParameters(self, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
 
 class SlaveException(ProfibusError):
     def __init__(self, message):

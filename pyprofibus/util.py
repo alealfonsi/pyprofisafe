@@ -115,6 +115,37 @@ class TimeLimit(object):
 		if self.__limit < 0:
 			return False	# Unlimited
 		return monotonic_time() >= self.__endTime
+	
+class TimeLimitMilliseconds(object):
+
+	__limit_ms = 0
+
+	def __init__(self, limit_ms = 0):
+		self.__limit_ms = limit_ms
+		self.start()
+
+	# (Re-)start the time.
+	def start(self, limit_ms = None):
+		if limit_ms is None:
+			limit_ms = self.__limit_ms
+		self.__limit_ms = limit_ms
+		if limit_ms >= 0:
+			self.__startTime = int(round(time.time() * 1000))
+			self.__endTime = self.__startTime + limit_ms
+		else:
+			self.__startTime = self.__endTime = -1
+
+	# Add seconds to the limit
+	def add(self, milliseconds):
+		if self.__limit_ms >= 0:
+			self.__limit_ms += milliseconds
+			self.__endTime = self.__startTime + self.__limit_ms
+
+	# Returns True, if the time limit exceed.
+	def exceed(self):
+		if self.__limit_ms < 0:
+			return False	# Unlimited
+		return (int(round(time.time() * 1000))) >= self.__endTime
 
 class FaultDebouncer(object):
 	"""Fault counter/debouncer.
