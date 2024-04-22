@@ -5,24 +5,29 @@ from pyprofibus.util import TimeLimit
 
 class SlaveState(ABC):
 
-    __slave = None
+    __slave: Slave = None
 
-    def getId(self):
+    def getSlave(self):
         return self.__slave
     
-    def setId(self, slave: Slave):
+    def setSlave(self, slave):
         self.__slave = Slave
 
     @abstractmethod
-    def setParameters(slave: Slave,
+    def setParameters(self,
                 watchdog_ms: int,
-                slave_reaction_time: int, 
-                freeze_mode_enable: bool,
-                locked: bool, 
+                slave_reaction_time, 
+                freeze_mode_enable,
+                locked, 
                 group, 
-                master_add: int,
-                id: int): 
+                master_add,
+                id): 
         """
         Sets the 7 mandatory parameter for a slave
         """
     
+    @abstractmethod
+    def setAddress(self, address):
+        """
+        Sets the address of the slave at start up
+        """

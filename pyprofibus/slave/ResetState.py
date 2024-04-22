@@ -3,6 +3,11 @@ from pyprofibus.slave.SlaveState import SlaveState
 
 class ResetState(SlaveState):
 
-    def setParameters(slave: Slave, watchdog, slave_reaction_time: int, freeze_mode_enable: bool, locked: bool, group, master_add: int, id: int):
-        raise SlaveException("Slave " + str(slave.getId()) + " is in Reset state, can't accept parameterization!")
+    def setParameters(self, watchdog, slave_reaction_time: int, freeze_mode_enable: bool, locked: bool, group, master_add: int, id: int):
+        raise SlaveException("Slave " + str(self.getSlave().getId()) + " is in Reset state, can't accept parameterization!")
         
+    def setAddress(self, address):
+        if address < 0 or address > 125:
+            raise SlaveException("Address not valid! (not in range 0 - 125)")
+        else:
+            self.getSlave().setAddress(address)
