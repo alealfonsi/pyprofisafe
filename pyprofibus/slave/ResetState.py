@@ -1,5 +1,6 @@
 from pyprofibus.slave.Slave import Slave, SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
+from pyprofibus.slave.Wait_PrmState import Wait_PrmState
 
 class ResetState(SlaveState):
 
@@ -11,3 +12,4 @@ class ResetState(SlaveState):
             raise SlaveException("Address not valid! (not in range 0 - 125)")
         else:
             self.getSlave().setAddress(address)
+            self.setState(Wait_PrmState())
