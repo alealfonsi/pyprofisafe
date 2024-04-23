@@ -5,8 +5,13 @@ from pyprofibus.util import TimeLimit, TimeLimitMilliseconds
 
 class Wait_PrmState(SlaveState):
 
+    def __checkTelegram(self):
+        #TO-DO
+        """"""
+
     def setParameters(self, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         slave = self.getSlave()
+        slave.wd_limit = watchdog_ms
         slave.watchdog = TimeLimitMilliseconds(watchdog_ms)
         slave.slave_reaction_time = slave_reaction_time
         slave.freeze_mode_enable = freeze_mode_enable

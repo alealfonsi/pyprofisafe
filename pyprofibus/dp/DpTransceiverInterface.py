@@ -5,7 +5,10 @@ class DpTransceiverInterface(ABC):
 
     @abstractmethod
     def poll(self, timeout=0.0):
-        """Poll for incoming telegrams."""
+        """Poll for incoming telegrams.
+            Returns:
+                ok: receive was successful or not.
+                retTelegram: the DpTelegram received"""
         pass
 
     @abstractmethod

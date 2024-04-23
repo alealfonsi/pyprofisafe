@@ -1,19 +1,40 @@
+from pyprofibus.dp.dp import DpTransceiver
+from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
+from pyprofibus.physical.phy_interface import CpPhyInterface
 from pyprofibus.slave.SlaveInterface import SlaveInterface
 from pyprofibus.slave.SlaveState import SlaveState
-from pyprofibus.util import ProfibusError, TimeLimit, TimeLimitMilliseconds
+from pyprofibus.util import ProfibusError, TimeLimitMilliseconds
 
 class Slave(SlaveInterface):
     
-    __state: SlaveState = None
+    #state
+    __state: SlaveState
     
+    #parameters
+    master_address: int
     address: int = 126
-    watchdog: TimeLimitMilliseconds = None
-    slave_reaction_time: int = None
-    freeze_mode_enable: bool = None
-    locked: bool = None
-    group: int = None
-    master_add: int = None
-    id: str = None
+    wd_limit: int
+
+    watchdog: TimeLimitMilliseconds
+    slave_reaction_time: int
+    freeze_mode_enable: bool
+    locked: bool
+    group: int
+    master_add: int
+    id: str
+
+    #transceivers
+    phy: CpPhyInterface
+    fdlTrans: FdlTransceiver
+    dpTrans: DpTransceiver
+
+    def __init__(self, phy) -> None:
+        super().__init__()
+        self.fdlTrans = FdlTransceiver(self.phy)
+        self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
+
+    def resetWatchdog(self):
+        self.watchdog.start(self.wd_limit)
 
     def getState(self):
         return self.__state
@@ -26,6 +47,12 @@ class Slave(SlaveInterface):
 
     def setAddress(self, address):
         self.address = address
+    
+    def getDpTrans(self):
+        return self.dpTrans
+    
+    def getMasterAddress(self):
+        return self.master_address
 
     def setParameters(self, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         self.__state.setParameters(self, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
