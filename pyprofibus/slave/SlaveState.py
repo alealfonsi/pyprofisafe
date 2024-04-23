@@ -20,7 +20,10 @@ class SlaveState(ABC):
 		if ok and telegram:
 			if (telegram.sa == self.getSlave().getMasterAddress()) and (telegram.da == self.getAddress()):
 				self.getSlave().resetWatchdog()
-				self.__checkTelegram()
+				self.__checkTelegram(telegram)
+		else:
+			if telegram:
+				print("Received corrupt telegram:\n%s" % str(telegram))
 		
 	@abstractmethod
 	def __checkTelegram(self):
