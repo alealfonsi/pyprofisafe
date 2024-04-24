@@ -36,7 +36,7 @@ class Slave(SlaveInterface):
         self.fdlTrans = FdlTransceiver(self.phy)
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
     
-    def pollRx(self, timeout):
+    def receive(self, timeout):
         #timeout = time waiting in receiving state, polling countinously
         return self.__state.receive(self.dpTrans, timeout)
 
