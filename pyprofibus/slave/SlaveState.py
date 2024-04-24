@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pyprofibus.dp.dp import DpTransceiver
-from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTransceiver
 from pyprofibus.slave.Slave import Slave, SlaveException
 from pyprofibus.util import TimeLimit
 
@@ -9,25 +9,36 @@ class SlaveState(ABC):
 
 	__slave: Slave = None
 
-	def receive(self):
-		dpTrans = self.getSlave().getDpTrans()
-            
+	def receive(self, dpTrans):
 		try:
-			ok, telegram = dpTrans.poll()
+			ok, telegram = dpTrans.poll()#check arguments
 		except SlaveException as e:
 			print("RX error: %s" % str(e))
 			return
 		if ok and telegram:
-			if (telegram.sa == self.getSlave().getMasterAddress()) and (telegram.da == self.getAddress()):
+			if ((telegram.sa == self.getSlave().getMasterAddress()) and 
+			((telegram.da == self.getAddress()) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
 				self.getSlave().resetWatchdog()
-				self.__checkTelegram(telegram)
+				return self.checkTelegram(telegram)
 		else:
 			if telegram:
 				print("Received corrupt telegram:\n%s" % str(telegram))
 		
+	def send(self, telegram, dpTrans):
+		try:
+			self.checkTelegramToSend(telegram)
+			dpTrans.send()#check arguments
+		except SlaveException as e:
+			print(str(e))
+		
 	@abstractmethod
-	def __checkTelegram(self):
+	def checkTelegram(self):
 		"""Receive telegram"""
+	
+	@abstractmethod
+	def checkTelegramToSend(self, telegram):
+		"""Check that the telegram the slave wants to send is of the proper type and 
+		if the slave is in a state in which is possible to send it"""
 
 	def getSlave(self):
 		return self.__slave

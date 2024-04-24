@@ -1,4 +1,4 @@
-from pyprofibus.dp.dp import DpTransceiver
+from pyprofibus.dp.dp import DpTelegram, DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
 from pyprofibus.physical.phy_interface import CpPhyInterface
 from pyprofibus.slave.SlaveInterface import SlaveInterface
@@ -28,13 +28,30 @@ class Slave(SlaveInterface):
     fdlTrans: FdlTransceiver
     dpTrans: DpTransceiver
 
+    #telegrams
+    rx_telegram: DpTelegram = None
+
     def __init__(self, phy) -> None:
         super().__init__()
         self.fdlTrans = FdlTransceiver(self.phy)
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
+    
+    #Da controllare se controlla se qualcosa è stato ricevuto o se rimane in ascolto finchè non
+    # riceve qualcosa
+    def pollRx(self):
+        return self.__state.receive(self.dpTrans)
+
+    def send(self):
+        return self.__state.send(self.dpTrans)
 
     def resetWatchdog(self):
         self.watchdog.start(self.wd_limit)
+    
+    def getRxTelegram(self):
+        return self.rx_telegram
+    
+    def setRxTelegram(self, telegram):
+        self.rx_telegram = telegram
 
     def getState(self):
         return self.__state
