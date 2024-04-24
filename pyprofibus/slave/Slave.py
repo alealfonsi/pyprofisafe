@@ -47,10 +47,10 @@ class Slave(SlaveInterface):
     
     def receive(self, timeout):
         #timeout = time(seconds) waiting in receiving state, polling countinously
-        while timeout >= 0:
+        while timeout > 0:
             if self.__state.receive(self.dpTrans, 0.01): #check the watchdog every 10ms
                 break
-            if self.watchdog.exceed():
+            if self.watchdog is not None and self.watchdog.exceed():
                 self.watchdogExpired()
             timeout -= 0.01
             
@@ -61,6 +61,7 @@ class Slave(SlaveInterface):
         self.fail_safe_handler.setFailSafeProcessVariables()
         self.wd_expired = True
         self.__state = ResetState
+        self.watchdog = None
         raise WatchdogExpiredException("Slave " + id + ": watchdog expired!")
 
     def resetWatchdog(self):

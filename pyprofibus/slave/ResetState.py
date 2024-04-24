@@ -4,7 +4,7 @@ from pyprofibus.slave.Wait_PrmState import Wait_PrmState
 
 class ResetState(SlaveState):
 
-    def __checkTelegram(self):
+    def checkTelegram(self):
         #TO-DO
         """"""
 
