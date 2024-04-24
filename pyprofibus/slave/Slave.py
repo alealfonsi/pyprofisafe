@@ -37,11 +37,21 @@ class Slave(SlaveInterface):
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
     
     def receive(self, timeout):
-        #timeout = time waiting in receiving state, polling countinously
-        return self.__state.receive(self.dpTrans, timeout)
-
+        #timeout = time(seconds) waiting in receiving state, polling countinously
+        while timeout >= 0:
+            if self.__state.receive(self.dpTrans, 0.01): #check the watchdog every 10ms
+                break
+            if self.watchdog.exceed():
+                raise WatchdogExpiredException("Slave " + id + ": watchdog expired!")
+            timeout -= 0.01
+            
     def send(self):
         return self.__state.send(self.dpTrans)
+    
+    def watchdogExpired(self):
+        #send a telegram to the master (or broadcast)
+        #set fail safe state or go to reset state
+        """"""
 
     def resetWatchdog(self):
         self.watchdog.start(self.wd_limit)
@@ -76,6 +86,10 @@ class Slave(SlaveInterface):
 class SlaveException(ProfibusError):
     def __init__(self, message):
         super().__init__(message)
+
+class WatchdogExpiredException(SlaveException):
+    def __init__(self, message):
+        super().__init__(message)   
 
 
 

@@ -11,10 +11,10 @@ class SlaveState(ABC):
 
 	def receive(self, dpTrans, timeout):
 		try:
-			ok, telegram = dpTrans.poll(timeout)#check arguments
+			ok, telegram = dpTrans.poll(timeout)
 		except SlaveException as e:
 			print("RX error: %s" % str(e))
-			return
+			return False
 		if ok and telegram:
 			if ((telegram.sa == self.getSlave().getMasterAddress()) and 
 			((telegram.da == self.getAddress()) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
@@ -23,6 +23,7 @@ class SlaveState(ABC):
 		else:
 			if telegram:
 				print("Received corrupt telegram:\n%s" % str(telegram))
+			return False
 		
 	def send(self, telegram, dpTrans):
 		try:

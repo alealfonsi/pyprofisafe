@@ -16,9 +16,10 @@ class Data_ExchState(SlaveState):
                 #TO-DO
                  """Whatever other kind of fdl frame type accepted in this state...TO-DO later"""
             else:
-                 raise SlaveException("Slave " + str(self.getSlave().getId()) + """ is in 
+                raise SlaveException("Slave " + str(self.getSlave().getId()) + """ is in 
                                       Data Exchange state and can't accept this type of telegram.\n
                                       Telegram: %s""" % str(telegram))
+
     
     def __checkDpTelegram(self, telegram):
         #check if something with field check bit is important before this step
