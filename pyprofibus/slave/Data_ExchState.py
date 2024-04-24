@@ -1,4 +1,4 @@
-from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req
+from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTelegram_var
 from pyprofibus.slave.Slave import Slave, SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
@@ -6,35 +6,18 @@ from pyprofibus.slave.SlaveState import SlaveState
 class Data_ExchState(SlaveState):
 
     def checkTelegram(self, telegram):
-            if FdlTelegram_var.checkType(telegram):
-                return self.__checkDpTelegram(telegram)
-            elif telegram.da == FdlTelegram.ADDRESS_MCAST:
-                #TO-DO
-                #self.__handleMcastTelegram(telegram)
-                """"""
-            elif False:
-                #TO-DO
-                 """Whatever other kind of fdl frame type accepted in this state...TO-DO later"""
-            else:
-                raise SlaveException("Slave " + str(self.getSlave().getId()) + """ is in 
-                                      Data Exchange state and can't accept this type of telegram.\n
-                                      Telegram: %s""" % str(telegram))
-
-    
-    def __checkDpTelegram(self, telegram):
-        #check if something with field check bit is important before this step
-        if DpTelegram_DataExchange_Req.checkType(telegram):
+        if (
+             DpTelegram_DataExchange_Req.checkType(telegram) or
+             DpTelegram_GlobalControl.checkType(telegram)
+            ):
             self.getSlave().setRxTelegram(telegram)
             return True
-            #self.__handleDataExchangeRequest(telegram)
-        elif False:
-             #TO-DO
-             """Whatever other kind of dp frame accepted in this state...TO-DO later"""
         else:
              raise SlaveException("Slave " + str(self.getSlave().getId()) + """ is in 
                                       Data Exchange state and received a proper telegram at the fdl level 
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
+
     
     def checkTelegramToSend(self, telegram):
         if (DpTelegram_DataExchange_Con.checkType(telegram)

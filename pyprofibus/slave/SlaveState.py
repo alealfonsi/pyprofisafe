@@ -30,7 +30,7 @@ class SlaveState(ABC):
 		try:
 			self.checkTelegramToSend(telegram)
 			dpTrans.send(FdlFCB(False), telegram) 
-			#fcb is passed an disabled
+			#fcb is passed as disabled
 			#this feature is not really part of Profibus DP, but of the 
 			#standard Profibus. It will be useful with profisafe because
 			#its functioning is very similar to the virtual monitoring number
