@@ -18,8 +18,9 @@ class SlaveState(ABC):
 		if ok and telegram:
 			if ((telegram.sa == self.getSlave().getMasterAddress()) and 
 			((telegram.da == self.getAddress()) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
-				self.getSlave().resetWatchdog()
-				return self.checkTelegram(telegram)
+				if self.checkTelegram(telegram):
+					self.getSlave().resetWatchdog()
+					return True
 		else:
 			if telegram:
 				print("Received corrupt telegram:\n%s" % str(telegram))
