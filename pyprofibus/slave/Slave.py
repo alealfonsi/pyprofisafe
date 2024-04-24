@@ -36,10 +36,9 @@ class Slave(SlaveInterface):
         self.fdlTrans = FdlTransceiver(self.phy)
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
     
-    #Da controllare se controlla se qualcosa è stato ricevuto o se rimane in ascolto finchè non
-    # riceve qualcosa
-    def pollRx(self):
-        return self.__state.receive(self.dpTrans)
+    def pollRx(self, timeout):
+        #timeout = time waiting in receiving state, polling countinously
+        return self.__state.receive(self.dpTrans, timeout)
 
     def send(self):
         return self.__state.send(self.dpTrans)

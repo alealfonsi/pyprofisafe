@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class FdlFieldCheckBitInterface(ABC):
+class FdlFrameCountBitInterface(ABC):
     """Interface for FCB context."""
 
     @abstractmethod

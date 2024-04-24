@@ -11,7 +11,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
-from pyprofibus.fieldbus_data_link.FdlFieldCheckBitInterface import FdlFieldCheckBitInterface
+from pyprofibus.fieldbus_data_link.FdlFrameCountBitInterface import FdlFieldCheckBitInterface, FdlFrameCountBitInterface
 from pyprofibus.fieldbus_data_link.FdlTelegramInterface import FdlTelegramInterface
 from pyprofibus.fieldbus_data_link.FdlTransceiverInterface import FdlTransceiverInterface
 from pyprofibus.physical.phy import *
@@ -37,7 +37,7 @@ class FdlError(ProfibusError):
 	__slots__ = (
 	)
 
-class FdlFCB(FdlFieldCheckBitInterface):
+class FdlFCB(FdlFrameCountBitInterface):
 	"""FCB context, per slave.
 	"""
 

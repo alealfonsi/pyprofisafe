@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pyprofibus.dp.dp import DpTransceiver
-from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTransceiver
+from pyprofibus.fieldbus_data_link.fdl import FdlFCB, FdlTelegram, FdlTransceiver
 from pyprofibus.slave.Slave import Slave, SlaveException
 from pyprofibus.util import TimeLimit
 
@@ -9,9 +9,9 @@ class SlaveState(ABC):
 
 	__slave: Slave = None
 
-	def receive(self, dpTrans):
+	def receive(self, dpTrans, timeout):
 		try:
-			ok, telegram = dpTrans.poll()#check arguments
+			ok, telegram = dpTrans.poll(timeout)#check arguments
 		except SlaveException as e:
 			print("RX error: %s" % str(e))
 			return
@@ -27,7 +27,11 @@ class SlaveState(ABC):
 	def send(self, telegram, dpTrans):
 		try:
 			self.checkTelegramToSend(telegram)
-			dpTrans.send()#check arguments
+			dpTrans.send(FdlFCB(False), telegram) 
+			#fcb is passed an disabled
+			#this feature is not really part of Profibus DP, but of the 
+			#standard Profibus. It will be useful with profisafe because
+			#its functioning is very similar to the virtual monitoring number
 		except SlaveException as e:
 			print(str(e))
 		
