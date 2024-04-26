@@ -36,14 +36,10 @@ class Slave(SlaveInterface):
     #diagnostics
     wd_expired: bool = False
 
-    #fail-safe handler (application specific)
-    fail_safe_handler: FailSafeHandler
-
-    def __init__(self, phy, fail_safe_handler) -> None:
+    def __init__(self, phy) -> None:
         super().__init__()
         self.fdlTrans = FdlTransceiver(self.phy)
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
-        self.fail_safe_handler = fail_safe_handler
     
     def receive(self, timeout):
         #timeout = time(seconds) waiting in receiving state, polling countinously
