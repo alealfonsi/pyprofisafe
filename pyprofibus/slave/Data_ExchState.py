@@ -23,7 +23,7 @@ class Data_ExchState(SlaveState):
     def __checkAlarm(self, telegram):
         if DpTelegram_GlobalControl.checkType(telegram):
             if telegram.controlCommand == DpTelegram_GlobalControl.CCMD_CLEAR:
-                self.getSlave().setState(FailSafeProfibusState)
+                self.getSlave().setState(FailSafeProfibusState())
 
     
     def checkTelegramToSend(self, telegram):

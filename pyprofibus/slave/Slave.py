@@ -1,7 +1,7 @@
 from pyprofibus.dp.dp import DpTelegram, DpTelegram_GlobalControl, DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
 from pyprofibus.physical.phy_interface import CpPhyInterface
-from pyprofibus.slave.FailSafeHandler import FailSafeHandler
+from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
 from pyprofibus.slave.ResetState import ResetState
 from pyprofibus.slave.SlaveInterface import SlaveInterface
 from pyprofibus.slave.SlaveState import SlaveState
@@ -59,9 +59,8 @@ class Slave(SlaveInterface):
         return self.__state.send(telegram, self.dpTrans)
     
     def watchdogExpired(self):
-        self.fail_safe_handler.setFailSafeProcessVariables()
         self.wd_expired = True
-        self.__state = ResetState
+        self.__state = FailSafeProfibusState()
         self.watchdog = None
         raise WatchdogExpiredException("Slave " + id + ": watchdog expired!")
 
