@@ -1,4 +1,5 @@
-from pyprofibus.slave.Slave import Slave, SlaveException
+#from pyprofibus.slave.Slave import Slave, SlaveException
+from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_PrmState import Wait_PrmState
 

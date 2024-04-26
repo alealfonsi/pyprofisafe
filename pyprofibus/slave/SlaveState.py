@@ -2,12 +2,16 @@ from abc import ABC, abstractmethod
 
 from pyprofibus.dp.dp import DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlFCB, FdlTelegram, FdlTransceiver
-from pyprofibus.slave.Slave import Slave, SlaveException
+#from pyprofibus.slave.Slave import Slave, SlaveException
+from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.util import TimeLimit
 
 class SlaveState(ABC):
 
-	__slave: Slave = None
+	__slave = None
+ 
+	def __init__(self, slave):
+		self.__slave = slave
 
 	def receive(self, dpTrans, timeout):
 		try:
@@ -50,7 +54,7 @@ class SlaveState(ABC):
 		return self.__slave
     
 	def setSlave(self, slave):
-		self.__slave = Slave
+		self.__slave = slave
     
 	@abstractmethod
 	def setParameters(self,

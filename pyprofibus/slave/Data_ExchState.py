@@ -1,7 +1,7 @@
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTelegram_var
 from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
-from pyprofibus.slave.Slave import Slave, SlaveException
+from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 
 class Data_ExchState(SlaveState):

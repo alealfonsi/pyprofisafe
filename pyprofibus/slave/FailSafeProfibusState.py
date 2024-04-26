@@ -9,6 +9,7 @@ class FailSafeProfibusState(SlaveState):
         self.__setFailSafeProcessVariables()
         self.__clearOutputs()
         self.need_reparameterization = self.getSlave().wd_expired
+        print("Slave " + self.getSlave().getId() + " is entering fail safe state (Profibus)")
             
     def __clearOutputs():
         """TO-DO"""

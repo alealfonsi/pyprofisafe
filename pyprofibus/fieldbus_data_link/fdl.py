@@ -11,7 +11,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from pyprofibus.compat import *
 
-from pyprofibus.fieldbus_data_link.FdlFrameCountBitInterface import FdlFieldCheckBitInterface, FdlFrameCountBitInterface
+from pyprofibus.fieldbus_data_link.FdlFrameCountBitInterface import FdlFrameCountBitInterface
 from pyprofibus.fieldbus_data_link.FdlTelegramInterface import FdlTelegramInterface
 from pyprofibus.fieldbus_data_link.FdlTransceiverInterface import FdlTransceiverInterface
 from pyprofibus.physical.phy import *

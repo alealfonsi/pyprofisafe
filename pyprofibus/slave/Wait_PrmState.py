@@ -1,4 +1,4 @@
-from pyprofibus.slave.Slave import Slave, SlaveException
+from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_CfgState import Wait_CfgState
 from pyprofibus.util import TimeLimit, TimeLimitMilliseconds
@@ -20,7 +20,10 @@ class Wait_PrmState(SlaveState):
         slave.master_add = master_add
         slave.id = id
         
-        self.setState(Wait_CfgState())
+        self.getSlave().setState(Wait_CfgState(self.getSlave()))
     
     def setAddress(self, address):
         raise SlaveException("Slave " + str(self.getSlave().getId) + " is in Wait Parameterization state, can't accept address setting telegram!")
+    
+    def checkTelegramToSend(self, telegram):
+        """"""
