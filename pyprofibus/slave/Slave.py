@@ -1,4 +1,4 @@
-from pyprofibus.dp.dp import DpTelegram, DpTransceiver
+from pyprofibus.dp.dp import DpTelegram, DpTelegram_GlobalControl, DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
 from pyprofibus.physical.phy_interface import CpPhyInterface
 from pyprofibus.slave.FailSafeHandler import FailSafeHandler
@@ -53,6 +53,7 @@ class Slave(SlaveInterface):
             if self.watchdog is not None and self.watchdog.exceed():
                 self.watchdogExpired()
             timeout -= 0.01
+
             
     def send(self, telegram):
         return self.__state.send(telegram, self.dpTrans)

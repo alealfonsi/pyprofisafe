@@ -1,5 +1,6 @@
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTelegram_var
+from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
 from pyprofibus.slave.Slave import Slave, SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 
@@ -10,6 +11,7 @@ class Data_ExchState(SlaveState):
              DpTelegram_DataExchange_Req.checkType(telegram) or
              DpTelegram_GlobalControl.checkType(telegram)
             ):
+            self.__checkAlarm(telegram)
             self.getSlave().setRxTelegram(telegram)
             return True
         else:
@@ -17,6 +19,11 @@ class Data_ExchState(SlaveState):
                                       Data Exchange state and received a proper telegram at the fdl level 
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
+    
+    def __checkAlarm(self, telegram):
+        if DpTelegram_GlobalControl.checkType(telegram):
+            if telegram.controlCommand == DpTelegram_GlobalControl.CCMD_CLEAR:
+                self.getSlave().setState(FailSafeProfibusState)
 
     
     def checkTelegramToSend(self, telegram):
