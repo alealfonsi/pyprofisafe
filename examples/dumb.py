@@ -26,7 +26,7 @@ class Dumb():
         slave_2.setParameters(300, 300, True, False, 0, 3, "second")
         
         print(slave_3.wd_limit)
-        print(slave_2.wd_limit)
+        print(slave_2.wd_limit) #should break
         #print(slave_3.wd_limit)
         print(slave_1.master_add)
         print(slave_2.master_add)

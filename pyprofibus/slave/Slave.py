@@ -75,7 +75,7 @@ class Slave(SlaveInterface):
     
     def setState(self, state: SlaveState):
         self.__state = state
-        self.__state.setSlave(self)
+        #self.__state.setSlave(self)
     
     def getId(self):
         return self.id
