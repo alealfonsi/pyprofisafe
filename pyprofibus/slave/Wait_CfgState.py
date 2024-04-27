@@ -6,9 +6,10 @@ class Wait_CfgState(SlaveState):
     
     _self = None
     
-    def __new__(cls):
+    def __new__(cls, slave):
         if cls._self is None:
             cls._self = super().__new__(cls)
+        cls._self.setSlave(slave)
         return cls._self
 
     def checkTelegram(self):
