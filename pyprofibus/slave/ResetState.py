@@ -4,6 +4,13 @@ from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_PrmState import Wait_PrmState
 
 class ResetState(SlaveState):
+    
+    _self = None
+    
+    def __new__(cls):
+        if cls._self is None:
+            cls._self = super().__new__(cls)
+        return cls._self
 
     def checkTelegram(self):
         #TO-DO

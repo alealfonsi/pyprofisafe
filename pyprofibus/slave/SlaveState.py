@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 from pyprofibus.dp.dp import DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlFCB, FdlTelegram, FdlTransceiver
-#from pyprofibus.slave.Slave import Slave, SlaveException
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.util import TimeLimit
 

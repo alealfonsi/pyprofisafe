@@ -5,6 +5,13 @@ from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 
 class Data_ExchState(SlaveState):
+    
+    _self = None
+    
+    def __new__(cls):
+        if cls._self is None:
+            cls._self = super().__new__(cls)
+        return cls._self
 
     def checkTelegram(self, telegram):
         if (

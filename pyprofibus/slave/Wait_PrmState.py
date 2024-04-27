@@ -4,6 +4,13 @@ from pyprofibus.slave.Wait_CfgState import Wait_CfgState
 from pyprofibus.util import TimeLimit, TimeLimitMilliseconds
 
 class Wait_PrmState(SlaveState):
+    
+    _self = None
+    
+    def __new__(cls):
+        if cls._self is None:
+            cls._self = super().__new__(cls)
+        return cls._self
 
     def checkTelegram(self):
         #TO-DO

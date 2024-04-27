@@ -3,6 +3,7 @@ from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
 from pyprofibus.physical.phy_interface import CpPhyInterface
 from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
 from pyprofibus.slave.ResetState import ResetState
+from pyprofibus.slave.SlaveException import WatchdogExpiredException
 from pyprofibus.slave.SlaveInterface import SlaveInterface
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.util import TimeLimitMilliseconds
