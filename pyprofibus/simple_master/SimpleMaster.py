@@ -5,11 +5,21 @@
 # It manages data exchange communication
 # It manages clear and fail safe mode, through global control frames too
 
+import collections
 from pyprofibus.dp.dp import DpError, DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.master.dp_master import DpMaster, DpSlaveState
 
 class SimpleMaster(DpMaster):
+    
+    def __init__(self, dpmClass, phy, masterAddr, debug=False):
+        super().__init__(dpmClass, phy, masterAddr, debug)
+        self.__slaveStateHandlers = collections.ChainMap(
+            self.__slaveStateHandlers,
+            {DpSlaveState._STATE_INVALID: self.__runSlave_invalid}
+        )
+        self.clear_mode = False
+        
     
     # This method adds a slave in all the data structures used by
     # the DpMaster, and also sets its state. In this class, after 
@@ -130,9 +140,25 @@ class SimpleMaster(DpMaster):
         		  telegram = globCtl)
         
         for s in self.__slaveDescsList:
-            if self.__slaveStates[s.slaveAddr] == DpSlaveState.STATE_DX:
-                self.__slaveStates[s.slaveAddr] = DpSlaveState._STATE_INVALID
-    
-    # ADD THE HANDLER FOR THE INVALID STATE!!!
+            slave_state = self.__slaveStates[s.slaveAddr]
+            if slave_state.getState() == slave_state.STATE_DX:
+                slave_state.setState(slave_state._STATE_INVALID, -1)
         
+        self.clear_mode = True
+        # It is actually not necessary to manage the clear mode as a state of the master
+        # because his behaviour will just be driven by the state of the slaves,
+        # in fact the master in this mode will just communicate 0s to the slaves
+        # in data exchange mode (see __runSlave_invalid) or try to reparameterize
+        # the slaves that created problems
+        #CHECK THAT THE MASTER TRIES TO REPARAMETERIZE THE SLAVES THAT CREATED PROBLEMS!!! 
+                
+    
+    # Since we are now managing the clear mode and fail safe state for the slaves,
+    # we need to add the handler for the state _STATE_INVALID, the only missing in 
+    # the parent code, and this is done in the __init__ method of this class.
+    # This method is the handler for the communication when a slave is in fail safe mode,
+    # that is just sending frames with payload = 0, just if it was in the standard
+    # data exchange state.
+    def __runSlave_invalid(self):
+        """"""
         
