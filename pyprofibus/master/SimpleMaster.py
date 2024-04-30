@@ -150,15 +150,79 @@ class SimpleMaster(DpMaster):
         # in fact the master in this mode will just communicate 0s to the slaves
         # in data exchange mode (see __runSlave_invalid) or try to reparameterize
         # the slaves that created problems
-        #CHECK THAT THE MASTER TRIES TO REPARAMETERIZE THE SLAVES THAT CREATED PROBLEMS!!! 
                 
     
     # Since we are now managing the clear mode and fail safe state for the slaves,
     # we need to add the handler for the state _STATE_INVALID, the only missing in 
     # the parent code, and this is done in the __init__ method of this class.
     # This method is the handler for the communication when a slave is in fail safe mode,
-    # that is just sending frames with payload = 0, just if it was in the standard
-    # data exchange state.
-    def __runSlave_invalid(self):
-        """"""
+    # that is just sending frames with no payload, just if it was in the standard
+    # data exchange state, and also receiving frames with no payload (this is not fixed in the standard)
+    def __runSlave_invalid(self, slave):
+        slaveOutputSize = slave.slaveDesc.outputSize
+        if slave.pendingReq:
+            for telegram in slave.getRxQueue():
+                if slaveOutputSize == 0:
+                    # This slave should not send any data.
+                    self.__debugMsg("Ignoring telegram in "
+                                     "DataExchange with slave %d:\n%s" % (
+                                         slave.slaveDesc.slaveAddr, str(telegram)))
+                    slave.faultDeb.fault()
+                    continue
+                else:
+                    # This slave is supposed to send some data.
+                    # Get it.
+                    if not DpTelegram_DataExchange_Con.checkType(telegram):
+                        self.__debugMsg("Ignoring telegram in "
+                                         "DataExchange with slave %d:\n%s" % (
+                                             slave.slaveDesc.slaveAddr, str(telegram)))
+                        slave.faultDeb.fault()
+                        continue
+                    resFunc = telegram.fc & FdlTelegram.FC_RESFUNC_MASK
+                    if resFunc in (FdlTelegram.FC_DH, FdlTelegram.FC_RDH):
+                        self.__debugMsg("Slave %d requested diagnostics." %
+                                         slave.slaveDesc.slaveAddr)
+                        slave.setState(slave.STATE_WDXRDY, 0.2)
+                    elif resFunc == FdlTelegram.FC_RS:
+                        raise DpError("Service not active "
+                                      "on slave %d" % slave.slaveDesc.slaveAddr)
+                    #********************#
+                    if telegram.getDU() is not None:
+                        raise DpError("Received data from slave while in fail safe mode!")
+                    #********************#
+                    dataExInData = telegram.getDU()
+            # We received some data or an ACK (input-only slave).
+            slave.pendingReq = None
+            slave.faultDeb.ok()
+            slave.restartStateTimeout()
+            self._releaseSlave(slave)
+        else:
+            diagPeriod = slave.slaveDesc.diagPeriod
+            if diagPeriod > 0 and slave.dxCount >= diagPeriod:
+                # The input-only slave shall periodically be diagnosed.
+                # Go to diagnostic state.
+                slave.setState(slave.STATE_WDXRDY, 0.2)
+            else:
+                # Send the out data telegram with no payload.
+                if slave.slaveDesc.inputSize == 0:
+                    self.__debugMsg("This slave does not expect any data")
+                else:
+                    ok = self.__send(slave,
+                                     telegram=DpTelegram_DataExchange_Req(
+                                         da=slave.slaveDesc.slaveAddr,
+                                         sa=self.masterAddr,
+                                         du=None),
+                                     timeout=0.1)
+                    if ok:
+                        # We sent it. Reset the data.
+                        slave.toSlaveData = None
+                        slave.dxCount = min(slave.dxCount + 1, 0x3FFFFFFF)
+                    else:
+                        self.__debugMsg("DataExchange_Req failed")
+                        slave.faultDeb.fault()
+        if self.__checkFaultDeb(slave, True):
+            return None
+        return dataExInData
+
+
         

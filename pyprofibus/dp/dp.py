@@ -676,6 +676,7 @@ class DpTelegram_GetCfg_Con(_Cfg_Common):
 
 class DpTelegram_GlobalControl(DpTelegram):
 	# Control_Command bits
+	CCMD_OPERATE	= 0x00	# Operate mode: Do not clear outputs anymore
 	CCMD_CLEAR		= 0x02	# Clear_Data: Clear all outputs
 	CCMD_UNFREEZE		= 0x04	# Unfreeze: Freezing is cancelled
 	CCMD_FREEZE		= 0x08	# Freeze: Inputs are frozen
