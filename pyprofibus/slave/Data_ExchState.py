@@ -8,42 +8,41 @@ class Data_ExchState(SlaveState):
     
     _self = None
     
-    def __new__(cls, slave):
+    def __new__(cls):
         if cls._self is None:
             cls._self = super().__new__(cls)
-        cls._self.setSlave(slave)
         return cls._self
 
-    def checkTelegram(self, telegram):
+    def checkTelegram(self, slave, telegram):
         if (
              DpTelegram_DataExchange_Req.checkType(telegram) or
              DpTelegram_GlobalControl.checkType(telegram)
             ):
             self.__checkAlarm(telegram)
-            self.getSlave().setRxTelegram(telegram)
+            slave.setRxTelegram(telegram)
             return True
         else:
-             raise SlaveException("Slave " + str(self.getSlave().getId()) + """ is in 
+             raise SlaveException("Slave " + str(slave.getId()) + """ is in 
                                       Data Exchange state and received a proper telegram at the fdl level 
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
     
-    def __checkAlarm(self, telegram):
+    def __checkAlarm(self, slave, telegram):
         if DpTelegram_GlobalControl.checkType(telegram):
             if telegram.controlCommand == DpTelegram_GlobalControl.CCMD_CLEAR:
-                self.getSlave().setState(FailSafeProfibusState())
+                slave.setState(FailSafeProfibusState())
 
     
-    def checkTelegramToSend(self, telegram):
+    def checkTelegramToSend(self, slave, telegram):
         if (DpTelegram_DataExchange_Con.checkType(telegram)
-            and DpTelegram_DataExchange_Req.checkType(self.getSlave().getRxTelegram())):
+            and DpTelegram_DataExchange_Req.checkType(slave.getRxTelegram())):
              #some other check?
              return
         elif False:
              #TO-DO
              """Whatever other type of frame accepted in this state"""
         else:
-             raise SlaveException("Slave " + str(self.getSlave().getId()) + """ is in 
+             raise SlaveException("Slave " + str(slave.getId()) + """ is in 
                                       Data Exchange state. Cannot send this kind of telegram\n
                                       Telegram: %s""" % str(telegram))
         
@@ -58,8 +57,8 @@ class Data_ExchState(SlaveState):
     #    #TO-DO send the telegram
         
         
-    def setParameters(self, watchdog, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
-        raise SlaveException("Slave " + str(self.getSlave().getId()) + " is in Data Exchange state, can't accept parameterization!")
+    def setParameters(self, slave, watchdog, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
+        raise SlaveException("Slave " + str(slave.getId()) + " is in Data Exchange state, can't accept parameterization!")
 
-    def setAddress(self, address):
-        raise SlaveException("Slave " + str(self.getSlave().getId()) + " is in Data Exchange state, can't accept address setting telegram!")
+    def setAddress(self, slave, address):
+        raise SlaveException("Slave " + str(slave.getId()) + " is in Data Exchange state, can't accept address setting telegram!")

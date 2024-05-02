@@ -46,7 +46,7 @@ class Slave(SlaveInterface):
         received = False
         #timeout = time(seconds) waiting in receiving state, polling countinously
         while timeout > 0:
-            if self.__state.receive(self.dpTrans, 0.01): #check the watchdog every 10ms
+            if self.__state.receive(self, 0.01): #check the watchdog every 10ms
                 received = True            
                 break
             if self.watchdog is not None and self.watchdog.exceed():
@@ -60,7 +60,7 @@ class Slave(SlaveInterface):
     
     def watchdogExpired(self):
         self.wd_expired = True
-        self.__state = FailSafeProfibusState()
+        self.__state = FailSafeProfibusState(self)
         self.watchdog = None
         raise WatchdogExpiredException("Slave " + id + ": watchdog expired!")
 
@@ -78,7 +78,6 @@ class Slave(SlaveInterface):
     
     def setState(self, state: SlaveState):
         self.__state = state
-        #self.__state.setSlave(self)
     
     def getId(self):
         return self.id
@@ -93,7 +92,7 @@ class Slave(SlaveInterface):
         return self.master_address
 
     def setParameters(self, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
-        self.__state.setParameters(watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
+        self.__state.setParameters(self, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
 
    
 

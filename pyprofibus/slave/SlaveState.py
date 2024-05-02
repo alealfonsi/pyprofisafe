@@ -7,22 +7,17 @@ from pyprofibus.util import TimeLimit
 
 class SlaveState(ABC):
 
-	__slave = None
- 
-	def __init__(self, slave):
-		self.__slave = slave
-
-	def receive(self, dpTrans, timeout):
+	def receive(self, slave, timeout):
 		try:
-			ok, telegram = dpTrans.poll(timeout)
+			ok, telegram = slave.dpTrans.poll(timeout)
 		except SlaveException as e:
 			print("RX error: %s" % str(e))
 			return False
 		if ok and telegram:
-			if ((telegram.sa == self.getSlave().getMasterAddress()) and 
+			if ((telegram.sa == slave.getMasterAddress()) and 
 			((telegram.da == self.getAddress()) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
 				if self.checkTelegram(telegram):
-					self.getSlave().resetWatchdog()
+					slave.resetWatchdog()
 					return True
 		else:
 			if telegram:
@@ -48,15 +43,10 @@ class SlaveState(ABC):
 	def checkTelegramToSend(self, telegram):
 		"""Check that the telegram the slave wants to send is of the proper type and 
 		if the slave is in a state in which is possible to send it"""
-
-	def getSlave(self):
-		return self.__slave
-    
-	def setSlave(self, slave):
-		self.__slave = slave
     
 	@abstractmethod
 	def setParameters(self,
+				slave,
                 watchdog_ms: int,
                 slave_reaction_time, 
                 freeze_mode_enable,
@@ -74,5 +64,5 @@ class SlaveState(ABC):
         Sets the address of the slave at start up
         """
 	
-	def getAddress(self):
-		return self.__slave.address
+	def getAddress(self, slave):
+		return slave.address
