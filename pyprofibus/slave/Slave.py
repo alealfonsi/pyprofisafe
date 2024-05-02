@@ -40,16 +40,19 @@ class Slave(SlaveInterface):
     def __init__(self, phy) -> None:
         super().__init__()
         self.fdlTrans = FdlTransceiver(phy)
-        self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=True)
+        self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=False)
     
     def receive(self, timeout):
+        received = False
         #timeout = time(seconds) waiting in receiving state, polling countinously
         while timeout > 0:
             if self.__state.receive(self.dpTrans, 0.01): #check the watchdog every 10ms
+                received = True            
                 break
             if self.watchdog is not None and self.watchdog.exceed():
                 self.watchdogExpired()
             timeout -= 0.01
+        return received
 
             
     def send(self, telegram):

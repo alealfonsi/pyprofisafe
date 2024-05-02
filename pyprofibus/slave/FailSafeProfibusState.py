@@ -55,6 +55,15 @@ class FailSafeProfibusState(SlaveState):
                                       Fail safe mode and received a proper telegram at the fdl level 
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
+    
+    def checkTelegramToSend(self, telegram):
+        """"""
+
+    def setAddress(self, address):
+        """"""
+    
+    def setParameters(self, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
+        """"""
             
     def __clearOutputs():
         """TO-DO"""
