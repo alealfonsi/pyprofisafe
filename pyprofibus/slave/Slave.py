@@ -1,3 +1,4 @@
+import time
 from pyprofibus.dp.dp import DpTelegram, DpTelegram_GlobalControl, DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
 from pyprofibus.physical.phy_interface import CpPhyInterface
@@ -17,6 +18,7 @@ class Slave(SlaveInterface):
     master_address: int
     address: int = 126
     wd_limit: int
+    reaction_timer: TimeLimitMilliseconds
 
     watchdog: TimeLimitMilliseconds
     slave_reaction_time: int
@@ -41,13 +43,15 @@ class Slave(SlaveInterface):
         super().__init__()
         self.fdlTrans = FdlTransceiver(phy)
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=False)
+
     
     def receive(self, timeout):
         received = False
         #timeout = time(seconds) waiting in receiving state, polling countinously
         while timeout > 0:
             if self.__state.receive(self, 0.01): #check the watchdog every 10ms
-                received = True            
+                received = True
+                self.reaction_timer.start()           
                 break
             if self.watchdog is not None and self.watchdog.exceed():
                 self.watchdogExpired()
@@ -56,6 +60,8 @@ class Slave(SlaveInterface):
 
             
     def send(self, telegram):
+        while not self.reaction_timer.exceed():
+            time.sleep(0.01)
         return self.__state.send(telegram, self.dpTrans)
     
     def watchdogExpired(self):

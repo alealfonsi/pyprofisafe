@@ -19,6 +19,7 @@ class Wait_CfgState(SlaveState):
         slave.wd_limit = watchdog_ms
         slave.watchdog = TimeLimitMilliseconds(watchdog_ms)
         slave.slave_reaction_time = slave_reaction_time
+        slave.reaction_timer = TimeLimitMilliseconds(slave_reaction_time)
         slave.freeze_mode_enable = freeze_mode_enable
         slave.locked = locked
         slave.group = group
