@@ -13,12 +13,14 @@ class AppSlave():
         #init
         phy = CpPhySerial("/dev/ttyS0", True)
         slave = Slave(phy)
-        slave.setState(Wait_PrmState(slave))
+        slave.setState(ResetState())
+        #slave.setState(Wait_PrmState(slave))
 
         try:
             #parameterization
-            slave.setParameters(20000, 100, False, False, 0, 100, "first")
-            slave.setState(Data_ExchState(slave))
+            slave.setAddress(slave, 0)
+            slave.setParameters(slave, 20000, 100, False, False, 0, 100, "first")
+            slave.setState(Data_ExchState())
 
             out_du = bytearray()
 
