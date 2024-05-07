@@ -30,7 +30,7 @@ class PhyError(ProfibusError):
 	"""PHY exception.
 	"""
 
-class CpPhy(CpPhyInterface):
+class CpPhy():
 	"""PROFIBUS CP PHYsical layer base class.
 	"""
 

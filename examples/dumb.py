@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(0, "/home/alealfo/pyprofisafe")
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 
 from pyprofibus.slave.Slave import Slave

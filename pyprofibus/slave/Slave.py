@@ -68,7 +68,7 @@ class Slave(SlaveInterface):
         self.wd_expired = True
         self.__state = FailSafeProfibusState(self)
         self.watchdog = None
-        raise WatchdogExpiredException("Slave " + id + ": watchdog expired!")
+        raise WatchdogExpiredException("Slave " + self.id + ": watchdog expired!")
 
     def resetWatchdog(self):
         self.watchdog.start(self.wd_limit)
@@ -89,7 +89,7 @@ class Slave(SlaveInterface):
         return self.id
 
     def setAddress(self, address):
-        self.address = address
+        self.__state.setAddress(self, address)
     
     def getDpTrans(self):
         return self.dpTrans

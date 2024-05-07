@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 import pyprofibus
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
 from pyprofibus.physical.phy_serial import CpPhySerial
@@ -10,16 +12,15 @@ from pyprofibus.slave.Wait_PrmState import Wait_PrmState
 
 class AppSlave():
     def main():
-        #init
-        phy = CpPhySerial("/dev/ttyS0", True)
-        slave = Slave(phy)
-        slave.setState(ResetState())
-        #slave.setState(Wait_PrmState(slave))
-
         try:
+            #init
+            phy = CpPhySerial("/dev/ttyS0", True)
+            slave = Slave(phy)
+            slave.setState(ResetState())
+            #slave.setState(Wait_PrmState(slave))
             #parameterization
-            slave.setAddress(slave, 0)
-            slave.setParameters(slave, 20000, 100, False, False, 0, 100, "first")
+            slave.setAddress(0)
+            slave.setParameters(60000, 100, False, False, 0, 100, "first")
             slave.setState(Data_ExchState())
 
             out_du = bytearray()
@@ -47,8 +48,10 @@ class AppSlave():
             print("Terminating slave: %s" % str(e))
             return 1
         finally:
-            if slave:
-                slave.destroy()
+            if phy:
+                import subprocess
+                subprocess.run("stty -F /dev/ttyS0 sane", shell=True, capture_output=True, text=True)
+                #phy.close()
         return 0
 
 if __name__ == "__main__":

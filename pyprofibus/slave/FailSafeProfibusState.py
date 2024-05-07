@@ -1,5 +1,4 @@
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Req, DpTelegram_GlobalControl, DpTelegram_SetPrm_Req
-from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_PrmState import Wait_PrmState
@@ -10,7 +9,7 @@ class FailSafeProfibusState(SlaveState):
     need_reparameterization: bool
     _self = None
     
-    def __new__(cls):
+    def __new__(cls, slave=None):
         if cls._self is None:
             cls._self = super().__new__(cls)
         return cls._self
@@ -34,6 +33,8 @@ class FailSafeProfibusState(SlaveState):
             return self.__check(telegram)
     
     def __check(self, slave, telegram):
+        from pyprofibus.slave.Data_ExchState import Data_ExchState
+
         if DpTelegram_DataExchange_Req.checkType(telegram):
             if telegram.getDU() is not None:
                 raise SlaveException("Slave " + str(slave.getId()) + """
@@ -58,14 +59,14 @@ class FailSafeProfibusState(SlaveState):
     def checkTelegramToSend(self, telegram):
         """"""
 
-    def setAddress(self, address):
+    def setAddress(self, slave, address):
         """"""
     
     def setParameters(self, slave, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         """"""
             
-    def __clearOutputs():
+    def __clearOutputs(self):
         """TO-DO"""
 
-    def __setFailSafeProcessVariables():
+    def __setFailSafeProcessVariables(self):
         """TO-DO"""

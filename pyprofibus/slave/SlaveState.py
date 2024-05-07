@@ -59,10 +59,11 @@ class SlaveState(ABC):
         """
     
 	@abstractmethod
-	def setAddress(self, address):
+	def setAddress(self, slave, address):
 		"""
         Sets the address of the slave at start up
         """
 	
 	def getAddress(self, slave):
 		return slave.address
+	

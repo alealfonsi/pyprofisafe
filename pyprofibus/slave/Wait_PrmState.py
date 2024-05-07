@@ -34,3 +34,5 @@ class Wait_PrmState(SlaveState):
     
     def checkTelegramToSend(self, telegram):
         """"""
+    
+    

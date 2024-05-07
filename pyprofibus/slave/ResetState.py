@@ -23,5 +23,8 @@ class ResetState(SlaveState):
         if address < 0 or address > 125:
             raise SlaveException("Address not valid! (not in range 0 - 125)")
         else:
-            slave.setAddress(address)
-            self.setState(Wait_PrmState())
+            slave.address = address
+            slave.setState(Wait_PrmState())
+        
+    def checkTelegramToSend(self, telegram):
+        """"""
