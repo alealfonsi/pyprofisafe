@@ -18,7 +18,7 @@ class Data_ExchState(SlaveState):
              DpTelegram_DataExchange_Req.checkType(telegram) or
              DpTelegram_GlobalControl.checkType(telegram)
             ):
-            self.__checkAlarm(telegram)
+            self.__checkAlarm(slave, telegram)
             slave.setRxTelegram(telegram)
             return True
         else:

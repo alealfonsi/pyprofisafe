@@ -56,7 +56,7 @@ class FailSafeProfibusState(SlaveState):
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
     
-    def checkTelegramToSend(self, telegram):
+    def checkTelegramToSend(self, slave, telegram):
         """"""
 
     def setAddress(self, slave, address):

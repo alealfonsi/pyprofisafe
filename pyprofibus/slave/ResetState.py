@@ -26,5 +26,5 @@ class ResetState(SlaveState):
             slave.address = address
             slave.setState(Wait_PrmState())
         
-    def checkTelegramToSend(self, telegram):
+    def checkTelegramToSend(self, slave, telegram):
         """"""

@@ -15,8 +15,8 @@ class SlaveState(ABC):
 			return False
 		if ok and telegram:
 			if ((telegram.sa == slave.getMasterAddress()) and 
-			((telegram.da == self.getAddress()) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
-				if self.checkTelegram(telegram):
+			((telegram.da == self.getAddress(slave)) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
+				if self.checkTelegram(slave, telegram):
 					slave.resetWatchdog()
 					return True
 		else:
@@ -24,9 +24,9 @@ class SlaveState(ABC):
 				print("Received corrupt telegram:\n%s" % str(telegram))
 			return False
 		
-	def send(self, telegram, dpTrans):
+	def send(self, slave, telegram, dpTrans):
 		try:
-			self.checkTelegramToSend(telegram)
+			self.checkTelegramToSend(slave, telegram)
 			dpTrans.send(FdlFCB(False), telegram) 
 			#fcb is passed as disabled
 			#this feature is not really part of Profibus DP, but of the 
@@ -36,11 +36,11 @@ class SlaveState(ABC):
 			print(str(e))
 		
 	@abstractmethod
-	def checkTelegram(self):
+	def checkTelegram(self, telegram):
 		"""Receive telegram"""
 	
 	@abstractmethod
-	def checkTelegramToSend(self, telegram):
+	def checkTelegramToSend(self, slave, telegram):
 		"""Check that the telegram the slave wants to send is of the proper type and 
 		if the slave is in a state in which is possible to send it"""
     
@@ -59,7 +59,7 @@ class SlaveState(ABC):
         """
     
 	@abstractmethod
-	def setAddress(self, slave, address):
+	def setAddress(self, address):
 		"""
         Sets the address of the slave at start up
         """

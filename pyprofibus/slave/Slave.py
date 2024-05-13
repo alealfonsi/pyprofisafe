@@ -15,7 +15,6 @@ class Slave(SlaveInterface):
     __state: SlaveState
     
     #parameters
-    master_address: int
     address: int = 126
     wd_limit: int
     reaction_timer: TimeLimitMilliseconds
@@ -62,7 +61,7 @@ class Slave(SlaveInterface):
     def send(self, telegram):
         while not self.reaction_timer.exceed():
             time.sleep(0.01)
-        return self.__state.send(telegram, self.dpTrans)
+        return self.__state.send(self, telegram, self.dpTrans)
     
     def watchdogExpired(self):
         self.wd_expired = True
@@ -95,7 +94,7 @@ class Slave(SlaveInterface):
         return self.dpTrans
     
     def getMasterAddress(self):
-        return self.master_address
+        return self.master_add
 
     def setParameters(self, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         self.__state.setParameters(self, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)

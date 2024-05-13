@@ -32,7 +32,7 @@ class Wait_PrmState(SlaveState):
     def setAddress(self, slave, address):
         raise SlaveException("Slave " + str(slave.getId) + " is in Wait Parameterization state, can't accept address setting telegram!")
     
-    def checkTelegramToSend(self, telegram):
+    def checkTelegramToSend(self, slave, telegram):
         """"""
     
     

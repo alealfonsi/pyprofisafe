@@ -29,5 +29,5 @@ class Wait_CfgState(SlaveState):
     def setAddress(self, slave, address):
         raise SlaveException("Slave " + str(slave.getId) + " is in Wait Configuration state, can't accept address setting telegram!")
 
-    def checkTelegramToSend(self, telegram):
+    def checkTelegramToSend(self, slave, telegram):
         """"""    
