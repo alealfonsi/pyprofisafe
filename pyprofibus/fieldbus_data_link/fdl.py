@@ -12,7 +12,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from pyprofibus.compat import *
 
 from pyprofibus.fieldbus_data_link.FdlFrameCountBitInterface import FdlFrameCountBitInterface
-from pyprofibus.fieldbus_data_link.FdlTelegramInterface import FdlTelegramInterface
 from pyprofibus.fieldbus_data_link.FdlTransceiverInterface import FdlTransceiverInterface
 from pyprofibus.physical.phy import *
 from pyprofibus.util import *
@@ -144,7 +143,7 @@ class FdlTransceiver(FdlTransceiverInterface):
 					fcb.FCBnext()
 		self.phy.send(telegram, srd)
 
-class FdlTelegram(FdlTelegramInterface):
+class FdlTelegram():
 	# Start delimiter
 	SD1		= 0x10	# No DU
 	SD2		= 0x68	# Variable DU

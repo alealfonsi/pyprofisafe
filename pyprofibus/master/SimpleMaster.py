@@ -14,8 +14,8 @@ class SimpleMaster(DpMaster):
     
     def __init__(self, dpmClass, phy, masterAddr, debug=False):
         super().__init__(dpmClass, phy, masterAddr, debug)
-        self.__slaveStateHandlers = collections.ChainMap(
-            self.__slaveStateHandlers,
+        self._DpMaster__slaveStateHandlers = collections.ChainMap(
+            self._DpMaster__slaveStateHandlers,
             {DpSlaveState._STATE_INVALID: self.__runSlave_invalid}
         )
         self.clear_mode = False
@@ -28,7 +28,7 @@ class SimpleMaster(DpMaster):
     
     def addSlave(self, slaveDesc, time_limit):
         super().addSlave(slaveDesc)
-        slave = self.__slaveStates[slaveDesc.slaveAddr]
+        slave = self._DpMaster__slaveStates[slaveDesc.slaveAddr]
         slave.setState(slave.STATE_DX, time_limit)
         slave.applyState()
         
@@ -131,7 +131,7 @@ class SimpleMaster(DpMaster):
         return dataExInData
     
     def goToClearMode(self):
-        slave = self.__slaveStates[FdlTelegram.ADDRESS_MCAST]
+        slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
         globCtl = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
         				   sa = self.masterAddr)
         globCtl.controlCommand |= DpTelegram_GlobalControl.CCMD_CLEAR
@@ -139,8 +139,8 @@ class SimpleMaster(DpMaster):
         self.dpTrans.send(fcb = slave.fcb,
         		  telegram = globCtl)
         
-        for s in self.__slaveDescsList:
-            slave_state = self.__slaveStates[s.slaveAddr]
+        for s in self._DpMaster__slaveDescsList:
+            slave_state = self._DpMaster__slaveStates[s.slaveAddr]
             if slave_state.getState() == slave_state.STATE_DX:
                 slave_state.setState(slave_state._STATE_INVALID, -1)
         

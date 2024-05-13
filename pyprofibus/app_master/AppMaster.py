@@ -1,13 +1,13 @@
 import sys
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 from pyprofibus.master.SimpleMaster import SimpleMaster
 from pyprofibus.physical.phy_serial import CpPhySerial
-sys.path.insert(0, "..")
 import pyprofibus
 
 class AppMaster():
     
-    def main(confdir="."):
+    def main(confdir="/home/alessio/pyprofisafe/pyprofibus/app_master"):
         master = None
         try:
             # Parse the config file.
@@ -22,17 +22,17 @@ class AppMaster():
                 slaveDesc = slaveConf.makeDpSlaveDesc()
 
                 # Set User_Prm_Data
-                dp1PrmMask = bytearray((pyprofibus.dp.DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
-                                        pyprofibus.dp.DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
+                dp1PrmMask = bytearray((pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
+                                        pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
                                         0x00))
-                dp1PrmSet  = bytearray((pyprofibus.dp.DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
-                                        pyprofibus.dp.DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
+                dp1PrmSet  = bytearray((pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
+                                        pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
                                         0x00))
                 slaveDesc.setUserPrmData(slaveConf.gsd.getUserPrmData(dp1PrmMask=dp1PrmMask,
                                                                       dp1PrmSet=dp1PrmSet))
 
                 # Register the slave at the DPM
-                master.addSlave(slaveDesc)
+                master.addSlave(slaveDesc, 60)
 
                 # Set initial output data.
                 outData[slaveDesc.name] = bytearray((0x12, 0x34))
@@ -63,6 +63,8 @@ class AppMaster():
         finally:
             if master:
                 master.destroy()
+                import subprocess
+                subprocess.run("stty -F /dev/ttyS0 sane", shell=True, capture_output=True, text=True)
         return 0
 
 
