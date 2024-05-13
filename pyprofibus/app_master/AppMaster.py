@@ -32,7 +32,7 @@ class AppMaster():
                                                                       dp1PrmSet=dp1PrmSet))
 
                 # Register the slave at the DPM
-                master.addSlave(slaveDesc, 60)
+                master.addSlave(slaveDesc, 600)
 
                 # Set initial output data.
                 outData[slaveDesc.name] = bytearray((0x12, 0x34))
