@@ -4,8 +4,13 @@
         "-s",
         "./tests",
         "-p",
-        "test_*.py"
+        "test_*.py",
+        "/home/alessio/pyprofisafe",
+        "/home/alessio/pyprofisafe/tests"
     ],
     "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true
+    "python.testing.unittestEnabled": true,
+    "python.analysis.extraPaths": [
+        "/home/alessio/pyprofisafe"
+    ]
 }

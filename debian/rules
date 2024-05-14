@@ -11,7 +11,7 @@ export PYBUILD_DESTDIR_python3=debian/destdir-py3-pyprofibus/
 export PYBUILD_DESTDIR_python3-dbg=debian/destdir-py3-pyprofibus-dbg/
 
 export PYTHONDONTWRITEBYTECODE=1
-export PYTHONPATH=
+export PYTHONPATH=/home/alessio/pyprofisafe
 export PYTHONSTARTUP=
 export PYTHONINSPECT=
 

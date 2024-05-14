@@ -1,15 +1,21 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
-from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
-from pyprofibus.physical.phy_serial import CpPhySerial
+from pyprofibus_tstlib import *
+initTest(__file__)
+import sys
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.slave.ResetState import ResetState
 from pyprofibus.slave.Slave import Slave
-from pyprofibus_tstlib import *
-initTest(__file__)
+from pyprofibus.physical.phy_serial import CpPhySerial
+from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
 
-class Test_MasterSlaveProfibus():
+
+
+class Test_MasterSlaveProfibus(TestCase):
     
-    def test_DataExchangeTelegram():
+    def test_DataExchangeTelegram(self):
+        
+        
         #init
         phy = CpPhySerial("/dev/ttyS0", True)
         slave = Slave(phy)

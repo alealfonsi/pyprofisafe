@@ -26,7 +26,8 @@ run_pyunit()
 		echo "==="
 		echo "= Running $interpreter..."
 		echo "==="
-		export PYTHONPATH="$rootdir/tests:$PYTHONPATH"
+		#export PYTHONPATH="$rootdir/tests:$PYTHONPATH"
+		export PYTHONPATH="/home/alessio/pyprofisafe/tests:$PYTHONPATH"
 		cd "$rootdir" || die "Failed to cd to rootdir."
 		"$interpreter" -m unittest --failfast --buffer --catch "$test_dir" ||\
 			die "Test failed"
