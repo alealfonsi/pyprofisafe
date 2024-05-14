@@ -1,10 +1,4 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
-
-import sys
-sys.path.insert(0, "/home/alessio/pyprofisafe")
-
-from pyprofibus import *
-
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
 from pyprofibus.physical.phy_serial import CpPhySerial
 from pyprofibus.slave.Data_ExchState import Data_ExchState
@@ -12,13 +6,6 @@ from pyprofibus.slave.ResetState import ResetState
 from pyprofibus.slave.Slave import Slave
 from pyprofibus_tstlib import *
 initTest(__file__)
-
-import pyprofibus
-import pyprofibus.conf
-import pyprofibus.dp
-import pyprofibus.master
-import pyprofibus.physical
-import pyprofibus.slave
 
 class Test_MasterSlaveProfibus():
     
