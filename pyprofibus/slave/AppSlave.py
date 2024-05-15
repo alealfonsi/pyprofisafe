@@ -1,9 +1,10 @@
 import sys
-sys.path.insert(0, "/home/alessio/pyprofisafe")
+sys.path.insert(0, "/home/alessio/lib/pyprofisafe")
 import pyprofibus
+
+from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
 from pyprofibus.physical.phy_serial import CpPhySerial
-from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.slave.ResetState import ResetState
 from pyprofibus.slave.Slave import Slave
 from pyprofibus.slave.SlaveException import SlaveException
