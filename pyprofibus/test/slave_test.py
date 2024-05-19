@@ -1,7 +1,7 @@
 import sys
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
-sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 import pyprofibus
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
@@ -9,7 +9,7 @@ from pyprofibus.physical.phy_serial import CpPhySerial
 from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.slave.ResetState import ResetState
 from pyprofibus.slave.Slave import Slave
-from pyprofibus.slave.SlaveException import SlaveException
+from pyprofibus.slave.SlaveException import SlaveException, WatchdogExpiredException
 
 from unittest import TestCase
 import unittest
@@ -20,17 +20,17 @@ class TestSlave(TestCase):
     slave: Slave
 
     @classmethod
-    def setUpClass(cls, self):
+    def setUpClass(cls):
         try:
             #init
             phy = CpPhySerial("/dev/ttyS0", True)
-            self.slave = Slave(phy)
-            self.slave.setState(ResetState())
+            cls.slave = Slave(phy)
+            cls.slave.setState(ResetState())
             #slave.setState(Wait_PrmState(slave))
             #parameterization
-            self.slave.setAddress(0)
-            self.slave.setParameters(600000, 100, False, False, 0, 111, "first")
-            self.slave.setState(Data_ExchState())
+            cls.slave.setAddress(0)
+            cls.slave.setParameters(20000, 100, False, False, 0, 111, "first")
+            cls.slave.setState(Data_ExchState())
 
             
 
@@ -62,10 +62,12 @@ class TestSlave(TestCase):
             self.slave.send(send_telegram)
 
     def testEnterClearModeSlave(self):
-        while isinstance(self.slave.getState(), Data_ExchState):
-            self.slave.receive(0.1)
-        self.assertTrue(isinstance(self.slave.getState(), FailSafeProfibusState))
-    
+        try:
+            while True:
+                self.slave.receive(0.1)
+        except WatchdogExpiredException:
+            self.assertTrue(isinstance(self.slave.getState(), FailSafeProfibusState))
+        
     @classmethod
     def tearDownClass(cls):
         
