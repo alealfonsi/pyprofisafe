@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(0, "/home/alessio/pyprofisafe")
 
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
 
 import pyprofibus
@@ -56,7 +57,8 @@ class TestSlave(TestCase):
             send_telegram = DpTelegram_DataExchange_Con(
                  self.slave.getMasterAddress(),
                  self.slave.address,
-                 self.slave.rx_telegram.fc,
+                 FdlTelegram.FC_OK,
+                 #self.slave.rx_telegram.fc,
                  out_du
             )
             self.slave.send(send_telegram)

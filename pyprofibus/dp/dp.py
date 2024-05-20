@@ -36,7 +36,7 @@ class DpError(ProfibusError):
 	__slots__ = (
 	)
 
-class DpTransceiver(DpTransceiverInterface):
+class DpTransceiver():
 	__slots__ = (
 		"fdlTrans",
 		"thisIsMaster",
@@ -66,7 +66,7 @@ class DpTransceiver(DpTransceiverInterface):
 	def send(self, fcb, telegram):
 		self.fdlTrans.send(fcb, telegram.toFdlTelegram())
 
-class DpTelegram(DpTelegramInterface):
+class DpTelegram():
 	# Source Service Access Point number
 	SSAP_MS2		= 50	# DPM2 to slave
 	SSAP_MS1		= 51	# DPM1 to slave
