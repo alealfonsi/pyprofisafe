@@ -29,7 +29,7 @@ class TestSlave(TestCase):
             #slave.setState(Wait_PrmState(slave))
             #parameterization
             cls.slave.setAddress(0)
-            cls.slave.setParameters(20000, 100, False, False, 0, 111, "first")
+            cls.slave.setParameters(200000, 100, False, False, 0, 111, "first")
             cls.slave.setState(Data_ExchState())
 
             
