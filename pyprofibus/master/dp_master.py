@@ -435,7 +435,7 @@ class DpMaster(DpMasterInterface):
 	def _releaseSlave(self, slave):
 		self.phy.releaseBus()
 
-	def __runSlave_init(self, slave):
+	def _runSlave_init(self, slave):
 		if slave.stateJustEntered():
 			self.__debugMsg("Trying to initialize slave %d..." % (
 				slave.slaveDesc.slaveAddr))
@@ -479,7 +479,7 @@ class DpMaster(DpMasterInterface):
 				return None
 		return None
 
-	def __runSlave_waitDiag(self, slave):
+	def _runSlave_waitDiag(self, slave):
 		if slave.stateJustEntered():
 			self.__debugMsg("Requesting Slave_Diag from slave %d..." %\
 				slave.slaveDesc.slaveAddr)
@@ -509,7 +509,7 @@ class DpMaster(DpMasterInterface):
 				return None
 		return None
 
-	def __runSlave_waitPrm(self, slave):
+	def _runSlave_waitPrm(self, slave):
 		if slave.stateJustEntered():
 			self.__debugMsg("Sending Set_Prm to slave %d..." %\
 				slave.slaveDesc.slaveAddr)
@@ -532,7 +532,7 @@ class DpMaster(DpMasterInterface):
 				return None
 		return None
 
-	def __runSlave_waitCfg(self, slave):
+	def _runSlave_waitCfg(self, slave):
 		if slave.stateJustEntered():
 			self.__debugMsg("Sending Chk_Cfg to slave %d..." %\
 				slave.slaveDesc.slaveAddr)
@@ -553,7 +553,7 @@ class DpMaster(DpMasterInterface):
 				return None
 		return None
 
-	def __runSlave_waitDxRdy(self, slave):
+	def _runSlave_waitDxRdy(self, slave):
 		if slave.stateJustEntered():
 			self.__debugMsg("Requesting Slave_Diag (WDXRDY) from slave %d..." %\
 				slave.slaveDesc.slaveAddr)
@@ -627,7 +627,7 @@ class DpMaster(DpMasterInterface):
 		self.__checkFaultDeb(slave, False)
 		return None
 
-	def __runSlave_dataExchange(self, slave):
+	def _runSlave_dataExchange(self, slave):
 		dataExInData = None
 
 		if slave.stateJustEntered():
@@ -730,13 +730,13 @@ class DpMaster(DpMasterInterface):
 			return True
 		return False
 
-	__slaveStateHandlers = {
-		DpSlaveState.STATE_INIT		: __runSlave_init,
-		DpSlaveState.STATE_WDIAG	: __runSlave_waitDiag,
-		DpSlaveState.STATE_WPRM		: __runSlave_waitPrm,
-		DpSlaveState.STATE_WCFG		: __runSlave_waitCfg,
-		DpSlaveState.STATE_WDXRDY	: __runSlave_waitDxRdy,
-		DpSlaveState.STATE_DX		: __runSlave_dataExchange,
+	_slaveStateHandlers = {
+		DpSlaveState.STATE_INIT		: _runSlave_init,
+		DpSlaveState.STATE_WDIAG	: _runSlave_waitDiag,
+		DpSlaveState.STATE_WPRM		: _runSlave_waitPrm,
+		DpSlaveState.STATE_WCFG		: _runSlave_waitCfg,
+		DpSlaveState.STATE_WDXRDY	: _runSlave_waitDxRdy,
+		DpSlaveState.STATE_DX		: _runSlave_dataExchange,
 	}
 
 	def __runSlave(self, slave):
@@ -751,7 +751,7 @@ class DpMaster(DpMasterInterface):
 			slave.setState(slave.STATE_INIT)
 			dataExInData = None
 		else:
-			handler = self.__slaveStateHandlers[slave.getState()]
+			handler = self._slaveStateHandlers[slave.getState()]
 			dataExInData = handler(self, slave)
 
 			if slave.stateIsChanging():

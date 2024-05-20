@@ -1,10 +1,12 @@
 import sys
-import time
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 
+
+import time
 import pyprofibus
+from pyprofibus.dp.dp import DpTelegram_SetPrm_Req
 from pyprofibus.master.SimpleMaster import SimpleMaster
 from pyprofibus.physical.phy_serial import CpPhySerial
-sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 from unittest import TestCase
 import unittest
@@ -15,7 +17,7 @@ class TestMaster(TestCase):
     outData: bytearray
 
     @classmethod
-    def setUpClass(cls, self) -> None:
+    def setUpClass(cls) -> None:
         confdir="/home/alessio/pyprofisafe/pyprofibus/app_master"
         master = None
         try:
@@ -26,16 +28,16 @@ class TestMaster(TestCase):
             master = config.makeSimpleDPM(CpPhySerial("/dev/ttyS0", True))
 
             # Create the slave descriptions.
-            self.outData = {}
+            cls.outData = {}
             for slaveConf in config.slaveConfs:
                 slaveDesc = slaveConf.makeDpSlaveDesc()
 
                 # Set User_Prm_Data
-                dp1PrmMask = bytearray((pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
-                                        pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
+                dp1PrmMask = bytearray((DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
+                                        DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
                                         0x00))
-                dp1PrmSet  = bytearray((pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
-                                        pyprofibus.dp.dp.DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
+                dp1PrmSet  = bytearray((DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
+                                        DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
                                         0x00))
                 slaveDesc.setUserPrmData(slaveConf.gsd.getUserPrmData(dp1PrmMask=dp1PrmMask,
                                                                       dp1PrmSet=dp1PrmSet))
@@ -44,11 +46,11 @@ class TestMaster(TestCase):
                 master.addSlave(slaveDesc, 600)
 
                 # Set initial output data.
-                self.outData[slaveDesc.name] = bytearray((0x12, 0x34))
+                cls.outData[slaveDesc.name] = bytearray((0x12, 0x34))
 
-            self.master = master
+            cls.master = master
             # Initialize the DPM
-            self.master.initialize()  
+            cls.master.initialize()  
 
         except pyprofibus.ProfibusError as e:
             print("Terminating: %s" % str(e))
@@ -56,7 +58,12 @@ class TestMaster(TestCase):
         return 0
     
     def testCyclicCommunicationMaster(self):
+
         for i in range(10):
+                ##### only for debug #####
+                if i % 2 == 0:
+                    """"""
+                ##########################
                 # Write the output data.
                 for slaveDesc in self.master.getSlaveList():
                     slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
@@ -83,8 +90,11 @@ class TestMaster(TestCase):
 
     
     @classmethod
-    def tearDownClass(cls, self) -> None:
-        if self.master:
-                self.master.destroy()
+    def tearDownClass(cls) -> None:
+        if cls.master:
+                cls.master.destroy()
                 import subprocess
                 subprocess.run("stty -F /dev/ttyS0 sane", shell=True, capture_output=True, text=True)
+
+if __name__ == '__main__':
+     unittest.main()

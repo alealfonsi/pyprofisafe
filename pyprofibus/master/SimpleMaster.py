@@ -14,9 +14,9 @@ class SimpleMaster(DpMaster):
     
     def __init__(self, dpmClass, phy, masterAddr, debug=False):
         super().__init__(dpmClass, phy, masterAddr, debug)
-        self._DpMaster__slaveStateHandlers = collections.ChainMap(
-            self._DpMaster__slaveStateHandlers,
-            {DpSlaveState._STATE_INVALID: self.__runSlave_invalid}
+        self._slaveStateHandlers = collections.ChainMap(
+            self._slaveStateHandlers,
+            {DpSlaveState._STATE_INVALID: self._runSlave_invalid}
         )
         self.clear_mode = False
         
@@ -41,7 +41,7 @@ class SimpleMaster(DpMaster):
     # modified to add a proper error management and clear mode, sending a multicast telegram
     # to all the slave so that they will switch to safe state 
     
-    def __runSlave_dataExchange(self, slave):
+    def _runSlave_dataExchange(self, slave):
         dataExInData = None
 
         if slave.stateJustEntered():
@@ -158,7 +158,7 @@ class SimpleMaster(DpMaster):
     # This method is the handler for the communication when a slave is in fail safe mode,
     # that is just sending frames with no payload, just if it was in the standard
     # data exchange state, and also receiving frames with no payload (this is not fixed in the standard)
-    def __runSlave_invalid(self, slave):
+    def _runSlave_invalid(self, slave):
         slaveOutputSize = slave.slaveDesc.outputSize
         if slave.pendingReq:
             for telegram in slave.getRxQueue():
