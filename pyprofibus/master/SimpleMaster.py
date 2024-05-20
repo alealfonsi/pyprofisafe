@@ -91,7 +91,8 @@ class SimpleMaster(DpMaster):
                 self._releaseSlave(slave)
             else:
                 # No data or ACK received from slave.
-                if slave.pendingReqTimeout.exceed():
+                #if slave.pendingReqTimeout.exceed():
+                if False:
                     self.__debugMsg("Data_Exchange timeout with slave %d" % (
                             slave.slaveDesc.slaveAddr))
                     #slave.faultDeb.fault()
