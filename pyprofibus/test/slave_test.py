@@ -74,6 +74,9 @@ class TestSlave(TestCase):
         except WatchdogExpiredException:
             self.assertTrue(isinstance(self.slave.getState(), FailSafeProfibusState))
         
+    def testReceiveGlobalTelegramForClearMode(self):
+        """"""
+
     @classmethod
     def tearDownClass(cls):
         
