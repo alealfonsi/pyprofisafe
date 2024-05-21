@@ -46,7 +46,8 @@ class TestMaster(TestCase):
                 master.addSlave(slaveDesc, 600)
 
                 # Set initial output data.
-                cls.outData[slaveDesc.name] = bytearray((0x12, 0x34))
+                cls.outData[slaveDesc.name] = bytearray((0x00, 0x00))
+                
 
             cls.master = master
             # Initialize the DPM
@@ -58,29 +59,28 @@ class TestMaster(TestCase):
         return 0
     
     def testCyclicCommunicationMaster(self):
+        c = 0
 
-        for i in range(10):
-                ##### only for debug #####
-                if i % 2 == 0:
-                    """"""
-                ##########################
+        while True:
                 # Write the output data.
                 for slaveDesc in self.master.getSlaveList():
                     slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
 
                 # Run slave state machines.
                 handledSlaveDesc = self.master.run()
+                c += 1
                 time.sleep(0.2)
 
                 # Get the in-data (receive)
                 if handledSlaveDesc:
                     inData = handledSlaveDesc.getMasterInData()
-                    #if i % 2 == 1:
-                    #     assert(inData is not None)
                     if inData is not None:
-                        # In our example the output data shall be the inverted input.
-                        self.outData[handledSlaveDesc.name][0] = inData[1]
-                        self.outData[handledSlaveDesc.name][1] = inData[0]  
+                        if inData[0] == 0x09 and inData[1] == 0x09:
+                             print(c)
+                             break
+                        self.outData[handledSlaveDesc.name][0] = inData[0] + 1
+                        self.outData[handledSlaveDesc.name][1] = inData[1] + 1
+
 
     def testEnterClearModeMaster(self):
          self.assertFalse(self.master.clear_mode)
