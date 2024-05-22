@@ -9,7 +9,7 @@ import collections
 from pyprofibus.dp.dp import DpError, DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.master.dp_master import DpMaster, DpSlaveState
-from pyprofibus.util import monotonic_time
+from pyprofibus.util import ProfibusError, monotonic_time
 
 class SimpleMaster(DpMaster):
     
@@ -24,11 +24,8 @@ class SimpleMaster(DpMaster):
 		    DpSlaveState.STATE_DX		: self._runSlave_dataExchange,
             DpSlaveState._STATE_INVALID : self._runSlave_invalid
     	}   
-        #self._slaveStateHandlers = collections.ChainMap(
-        #    self._slaveStateHandlers,
-        #    {DpSlaveState._STATE_INVALID: self._runSlave_invalid}
-        #)
         self.clear_mode = False
+        self.have_error_pool = []
         
     
     # This method adds a slave in all the data structures used by
@@ -164,9 +161,21 @@ class SimpleMaster(DpMaster):
     # we need to add the handler for the state _STATE_INVALID, the only missing in 
     # the parent code, and this is done in the __init__ method of this class.
     # This method is the handler for the communication when a slave is in fail safe mode,
-    # that is just sending frames with no payload, just if it was in the standard
-    # data exchange state, and also receiving frames with no payload (this is not fixed in the standard)
+    # that is just sending frames with payload = 0x00, 0x00, just if it was in the standard
+    # data exchange state, and also receiving frames with payload = 0x00, 0x00 (this is not fixed in the standard)
     def _runSlave_invalid(self, parent, slave):
+        dataExInData = self._run_invalid(slave)
+        for b in dataExInData:
+            if b != '\x00':
+                self._debugMsg("Received %b data different from 0 from slave %d but master is in Clear Mode" % (b, slave.slaveDesc.slaveAddr))
+                raise ProfibusError("Received data different from 0 but master is in Clear Mode")
+        if slave.slaveDesc.slaveAddr in self.have_error_pool:
+            self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+            self._checkExitClearMode()
+        return dataExInData
+
+
+    def _run_invalid(self, slave):
         dataExInData = None
 
         slaveOutputSize = slave.slaveDesc.outputSize
@@ -196,18 +205,22 @@ class SimpleMaster(DpMaster):
                     elif resFunc == FdlTelegram.FC_RS:
                         raise DpError("Service not active "
                                       "on slave %d" % slave.slaveDesc.slaveAddr)
-                    #********************#
-                    if telegram.getDU() is not None:
-                        raise DpError("Received data from slave while in fail safe mode!")
-                    #********************#
                     dataExInData = telegram.getDU()
-            # We received some data or an ACK (input-only slave).
-            ### MANCA QUALCOSA, VEDI DATA EXCHANGE!!!!
-            ### 
-            slave.pendingReq = None
-            slave.faultDeb.ok()
-            slave.restartStateTimeout()
-            self._releaseSlave(slave)
+            if (dataExInData is not None or
+                (slaveOutputSize == 0 and slave.shortAckReceived)):
+                # We received some data or an ACK (input-only slave).
+                slave.pendingReq = None
+                slave.faultDeb.ok()
+                slave.restartStateTimeout()
+                self._releaseSlave(slave)
+            else:
+                # No data or ACK received from slave.
+                if slave.pendingReqTimeout.exceed():
+                    self._debugMsg("Data_Exchange timeout with slave %d" % (
+                            slave.slaveDesc.slaveAddr))
+                    self.have_error_pool.append(slave.slaveDesc.slaveAddr)
+                    slave.pendingReq = None
+            
         else:
             diagPeriod = slave.slaveDesc.diagPeriod
             if diagPeriod > 0 and slave.dxCount >= diagPeriod:
@@ -215,7 +228,7 @@ class SimpleMaster(DpMaster):
                 # Go to diagnostic state.
                 slave.setState(slave.STATE_WDXRDY, 0.2)
             else:
-                # Send the out data telegram with no payload.
+                # Send the out data telegram with payload = 0x00, 0x00.
                 if slave.slaveDesc.inputSize == 0:
                     self._debugMsg("This slave does not expect any data")
                 else:
@@ -233,6 +246,9 @@ class SimpleMaster(DpMaster):
                         self._debugMsg("DataExchange_Req failed")
                         slave.faultDeb.fault()
         return dataExInData
+    
+    def _checkExitClearMode():
+        """"""
 
 
         
