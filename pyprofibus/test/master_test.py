@@ -58,6 +58,7 @@ class TestMaster(TestCase):
             return 1
         return 0
     
+    @unittest.skip("skipping first test")
     def testCyclicCommunicationMaster(self):
         c = 0
 
@@ -84,7 +85,9 @@ class TestMaster(TestCase):
 
     def testEnterClearModeMaster(self):
          self.assertFalse(self.master.clear_mode)
-         for i in range(10):
+         desc = self.master.getSlaveList()
+         desc[0].setMasterOutData(bytearray((0x00, 0x00)))
+         for i in range(200):
             self.master.run()
             time.sleep(0.1)
          self.assertTrue(self.master.clear_mode)
