@@ -165,13 +165,15 @@ class SimpleMaster(DpMaster):
     # data exchange state, and also receiving frames with payload = 0x00, 0x00 (this is not fixed in the standard)
     def _runSlave_invalid(self, parent, slave):
         dataExInData = self._run_invalid(slave)
-        for b in dataExInData:
-            if b != '\x00':
-                self._debugMsg("Received %b data different from 0 from slave %d but master is in Clear Mode" % (b, slave.slaveDesc.slaveAddr))
-                raise ProfibusError("Received data different from 0 but master is in Clear Mode")
-        if slave.slaveDesc.slaveAddr in self.have_error_pool:
-            self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
-            self._checkExitClearMode()
+        if dataExInData:
+            for b in dataExInData:
+                if b != '\x00':
+                    self._debugMsg("Received %b data different from 0 from slave %d but master is in Clear Mode" % (b, slave.slaveDesc.slaveAddr))
+                    raise ProfibusError("Received data different from 0 but master is in Clear Mode")
+            if slave.slaveDesc.slaveAddr in self.have_error_pool:
+                self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+                if len(self.have_error_pool) == 0:
+                    self.exitClearMode()
         return dataExInData
 
 
@@ -247,8 +249,28 @@ class SimpleMaster(DpMaster):
                         slave.faultDeb.fault()
         return dataExInData
     
-    def _checkExitClearMode():
-        """"""
+    # This method is called when all the slaves are working correctly, after the master
+    # going to Clear Mode. All the slaves are switched to the state in which they were 
+    # previously (master side). A global telegram is sent to communicate to all the slaves
+    # that the master is back to Operational Mode. 
+    def exitClearMode(self):
+        slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
+        globCtl = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
+        				   sa = self.masterAddr)
+        globCtl.controlCommand |= DpTelegram_GlobalControl.CCMD_OPERATE
+        globCtl.groupSelect = 0x00 #all slaves
+        self.dpTrans.send(fcb = slave.fcb,
+        		  telegram = globCtl)
+        
+        for s in self._DpMaster__slaveDescsList:
+            slave_state = self._DpMaster__slaveStates[s.slaveAddr]
+            if slave_state.getState() != slave_state._STATE_INVALID:
+                self._debugMsg("""Slave %d was expected to be in fail safe state
+                                 but was not (ignoring)""" % (s.slaveAddr))
+                continue
+            slave_state.setState(slave_state.__prevState)
+        
+        self.clear_mode = False        
 
 
         
