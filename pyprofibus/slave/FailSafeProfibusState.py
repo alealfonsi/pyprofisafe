@@ -23,6 +23,7 @@ class FailSafeProfibusState(SlaveState):
     def checkTelegram(self, slave, telegram):
         if self.need_reparameterization == True:
             if DpTelegram_SetPrm_Req.checkType(telegram):
+                self.need_reparameterization = False
                 slave.setState(Wait_PrmState())
                 return slave.checkTelegram(telegram)
             else:
@@ -36,11 +37,13 @@ class FailSafeProfibusState(SlaveState):
         from pyprofibus.slave.Data_ExchState import Data_ExchState
 
         if DpTelegram_DataExchange_Req.checkType(telegram):
-            if telegram.getDU() is not None:
-                raise SlaveException("Slave " + str(slave.getId()) + """
-                                     is in Fail safe mode but received a data exchange request
-                                     with payload.\n Telegram: %s""" % str(telegram))
+            for b in telegram.getDU():
+                if b != '\x00':
+                    raise SlaveException("Slave " + str(slave.getId()) + """
+                                     is in Fail Safe mode but received a data exchange request
+                                     with payload different from 0s.\n Telegram: %s""" % str(telegram))    
             slave.setRxTelegram(telegram)
+            self.sendResponse(slave, telegram)
             return True
         elif DpTelegram_GlobalControl.checkType(telegram):
             if telegram.controlCommand != DpTelegram_GlobalControl.CCMD_OPERATE:
@@ -55,15 +58,19 @@ class FailSafeProfibusState(SlaveState):
                                       Fail safe mode and received a proper telegram at the fdl level 
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
+        
+    def sendResponse(self, slave, telegram):
+        """TO-DO"""
     
     def checkTelegramToSend(self, slave, telegram):
         """"""
 
     def setAddress(self, slave, address):
-        """"""
+        raise SlaveException("Slave " + str(slave.getId()) + " is in Wait Parameterization state, can't accept address setting telegram!")
     
     def setParameters(self, slave, wd_on, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
-        """"""
+        raise SlaveException("""ERROR: method setParameters called on slave %d 
+                             that is in Fail Safe state!""" % slave.getId())
             
     def __clearOutputs(self):
         """TO-DO"""

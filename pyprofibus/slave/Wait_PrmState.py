@@ -1,4 +1,5 @@
 from pyprofibus.dp.dp import DpTelegram_SetPrm_Req
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram_ack
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_CfgState import Wait_CfgState
@@ -31,7 +32,14 @@ class Wait_PrmState(SlaveState):
             telegram.sa,
             parameters[7]
         )
+        self.sendResponse(slave)
         slave.setState(Wait_CfgState())
+    
+    def sendResponse(self, slave):
+        send_telegram = FdlTelegram_ack()
+        send_telegram.da = slave.master_address
+        send_telegram.sa = slave.getAddress()
+        slave.send(send_telegram)
 
     def setParameters(self, slave, wd_on: bool, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         if wd_on:    
@@ -51,6 +59,8 @@ class Wait_PrmState(SlaveState):
         raise SlaveException("Slave " + str(slave.getId) + " is in Wait Parameterization state, can't accept address setting telegram!")
     
     def checkTelegramToSend(self, slave, telegram):
-        """"""
+        if not FdlTelegram_ack.checkType(telegram):
+            raise SlaveException()
+        return True
     
     
