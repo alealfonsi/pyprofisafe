@@ -6,7 +6,7 @@
 # It manages clear and fail safe mode, through global control frames too
 
 import collections
-from pyprofibus.dp.dp import DpError, DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
+from pyprofibus.dp.dp import DpError, DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl, DpTelegram_SetPrm_Req
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.master.dp_master import DpMaster, DpSlaveState
 from pyprofibus.util import ProfibusError, monotonic_time
@@ -172,7 +172,7 @@ class SimpleMaster(DpMaster):
                     raise ProfibusError("Received data different from 0 but master is in Clear Mode")
             if slave.slaveDesc.slaveAddr in self.have_error_pool:
                 self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
-                if len(self.have_error_pool) == 0:
+        if len(self.have_error_pool) == 0:
                     self.exitClearMode()
         return dataExInData
 
@@ -193,21 +193,30 @@ class SimpleMaster(DpMaster):
                 else:
                     # This slave is supposed to send some data.
                     # Get it.
-                    if not DpTelegram_DataExchange_Con.checkType(telegram):
-                        self._debugMsg("Ignoring telegram in "
-                                         "DataExchange with slave %d:\n%s" % (
-                                             slave.slaveDesc.slaveAddr, str(telegram)))
-                        slave.faultDeb.fault()
-                        continue
-                    resFunc = telegram.fc & FdlTelegram.FC_RESFUNC_MASK
-                    if resFunc in (FdlTelegram.FC_DH, FdlTelegram.FC_RDH):
-                        self._debugMsg("Slave %d requested diagnostics." %
-                                         slave.slaveDesc.slaveAddr)
-                        slave.setState(slave.STATE_WDXRDY, 0.2)
-                    elif resFunc == FdlTelegram.FC_RS:
-                        raise DpError("Service not active "
-                                      "on slave %d" % slave.slaveDesc.slaveAddr)
-                    dataExInData = telegram.getDU()
+
+                    # CASE: the slave is working properly
+                    if slave.slaveDesc.slaveAddr not in self.have_error_pool:
+                        if not DpTelegram_DataExchange_Con.checkType(telegram):
+                            self._debugMsg("Ignoring telegram in "
+                                             "DataExchange with slave %d:\n%s" % (
+                                                 slave.slaveDesc.slaveAddr, str(telegram)))
+                            slave.faultDeb.fault()
+                            continue
+                        resFunc = telegram.fc & FdlTelegram.FC_RESFUNC_MASK
+                        if resFunc in (FdlTelegram.FC_DH, FdlTelegram.FC_RDH):
+                            self._debugMsg("Slave %d requested diagnostics." %
+                                             slave.slaveDesc.slaveAddr)
+                            slave.setState(slave.STATE_WDXRDY, 0.2)
+                        elif resFunc == FdlTelegram.FC_RS:
+                            raise DpError("Service not active "
+                                          "on slave %d" % slave.slaveDesc.slaveAddr)
+                        dataExInData = telegram.getDU()
+                    #CASE: broken slave, check if answered the set prm request
+                    else:
+                        if slave.shortAckReceived():
+                            self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+                            slave.setState(slave.STATE_WCFG)
+
             if (dataExInData is not None or
                 (slaveOutputSize == 0 and slave.shortAckReceived)):
                 # We received some data or an ACK (input-only slave).
@@ -234,12 +243,19 @@ class SimpleMaster(DpMaster):
                 if slave.slaveDesc.inputSize == 0:
                     self._debugMsg("This slave does not expect any data")
                 else:
-                    ok = self._send(slave,
-                                     telegram=DpTelegram_DataExchange_Req(
-                                         da=slave.slaveDesc.slaveAddr,
-                                         sa=self.masterAddr,
-                                         du=bytearray((0x00, 0x00))),
-                                     timeout=10)
+                    if slave.slaveDesc.slaveAddr not in self.have_error_pool:
+                        # slave working properly
+                        ok = self._send(slave,
+                                         telegram=DpTelegram_DataExchange_Req(
+                                             da=slave.slaveDesc.slaveAddr,
+                                             sa=self.masterAddr,
+                                             du=bytearray((0x00, 0x00))),
+                                         timeout=10)
+                    else:
+                        # broken slave, try to reparameterize
+                        ok = self._send(slave,
+                                        telegram=slave.slaveDesc.setPrmTelegram,
+                                        timeout=10)
                     if ok:
                         # We sent it. Reset the data.
                         slave.toSlaveData = None
@@ -250,8 +266,9 @@ class SimpleMaster(DpMaster):
         return dataExInData
     
     # This method is called when all the slaves are working correctly, after the master
-    # going to Clear Mode. All the slaves are switched to the state in which they were 
-    # previously (master side). A global telegram is sent to communicate to all the slaves
+    # going to Clear Mode. All the slaves are switched back to the data exchange state,
+    # except the one that was broken, that stays in the wait for configuration state.
+    # A global telegram is sent to communicate to all the slaves
     # that the master is back to Operational Mode. 
     def exitClearMode(self):
         slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
@@ -268,7 +285,9 @@ class SimpleMaster(DpMaster):
                 self._debugMsg("""Slave %d was expected to be in fail safe state
                                  but was not (ignoring)""" % (s.slaveAddr))
                 continue
-            slave_state.setState(slave_state.__prevState)
+            if slave_state.getState() == slave_state.STATE_WCFG:
+                continue
+            slave_state.setState(slave.STATE_DX, 10)
         
         self.clear_mode = False        
 
