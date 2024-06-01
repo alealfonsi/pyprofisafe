@@ -1,4 +1,5 @@
-from pyprofibus.dp.dp import DpTelegram_DataExchange_Req, DpTelegram_GlobalControl, DpTelegram_SetPrm_Req
+from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl, DpTelegram_SetPrm_Req
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_PrmState import Wait_PrmState
@@ -43,7 +44,7 @@ class FailSafeProfibusState(SlaveState):
                                      is in Fail Safe mode but received a data exchange request
                                      with payload different from 0s.\n Telegram: %s""" % str(telegram))    
             slave.setRxTelegram(telegram)
-            self.sendResponse(slave, telegram)
+            self.sendResponse(slave)
             return True
         elif DpTelegram_GlobalControl.checkType(telegram):
             if telegram.controlCommand != DpTelegram_GlobalControl.CCMD_OPERATE:
@@ -59,11 +60,17 @@ class FailSafeProfibusState(SlaveState):
                                     but not handled at the dp level (either wrong or not yet handled by the library)\n
                                       Telegram: %s""" % str(telegram))
         
-    def sendResponse(self, slave, telegram):
-        """TO-DO"""
+    def sendResponse(self, slave):
+        send_telegram = DpTelegram_DataExchange_Con(da=slave.getMasterAddress(),
+                                                    sa=slave.address,
+                                                    fc=FdlTelegram.FC_OK,
+                                                    du=bytearray(0x00, 0x00))
+        slave.send(send_telegram)
     
     def checkTelegramToSend(self, slave, telegram):
-        """"""
+        if not DpTelegram_DataExchange_Con.checkType(telegram):
+            raise SlaveException()
+        return True
 
     def setAddress(self, slave, address):
         raise SlaveException("Slave " + str(slave.getId()) + " is in Wait Parameterization state, can't accept address setting telegram!")
