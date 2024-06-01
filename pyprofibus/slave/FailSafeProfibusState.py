@@ -62,7 +62,7 @@ class FailSafeProfibusState(SlaveState):
     def setAddress(self, slave, address):
         """"""
     
-    def setParameters(self, slave, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
+    def setParameters(self, slave, wd_on, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         """"""
             
     def __clearOutputs(self):

@@ -45,8 +45,9 @@ class SlaveState(ABC):
 		if the slave is in a state in which is possible to send it"""
     
 	@abstractmethod
-	def setParameters(self,
+	def setParameters(self, 
 				slave,
+				wd_on: bool,
                 watchdog_ms: int,
                 slave_reaction_time, 
                 freeze_mode_enable,

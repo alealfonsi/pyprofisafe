@@ -16,7 +16,7 @@ class ResetState(SlaveState):
         #TO-DO
         """"""
 
-    def setParameters(self, slave, watchdog, slave_reaction_time: int, freeze_mode_enable: bool, locked: bool, group, master_add: int, id: int):
+    def setParameters(self, slave, wd_on, watchdog, slave_reaction_time: int, freeze_mode_enable: bool, locked: bool, group, master_add: int, id: int):
         raise SlaveException("Slave " + str(slave.getId()) + " is in Reset state, can't accept parameterization!")
         
     def setAddress(self, slave, address):

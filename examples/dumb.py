@@ -22,8 +22,8 @@ class Dumb():
         
         
     
-        slave_1.setParameters(100, 100, False, False, 0, 1, "first")
-        slave_2.setParameters(300, 300, True, False, 0, 3, "second")
+        slave_1.setParameters(True, 100, 100, False, False, 0, 1, "first")
+        slave_2.setParameters(True, 300, 300, True, False, 0, 3, "second")
         
         print(slave_3.wd_limit)
         print(slave_2.wd_limit) #should break

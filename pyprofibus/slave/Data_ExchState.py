@@ -57,7 +57,7 @@ class Data_ExchState(SlaveState):
     #    #TO-DO send the telegram
         
         
-    def setParameters(self, slave, watchdog, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
+    def setParameters(self, slave, wd_on, watchdog, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         raise SlaveException("Slave " + str(slave.getId()) + " is in Data Exchange state, can't accept parameterization!")
 
     def setAddress(self, slave, address):

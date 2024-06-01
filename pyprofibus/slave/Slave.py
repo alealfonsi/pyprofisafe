@@ -96,8 +96,8 @@ class Slave(SlaveInterface):
     def getMasterAddress(self):
         return self.master_add
 
-    def setParameters(self, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
-        self.__state.setParameters(self, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
+    def setParameters(self, wd_on: bool, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
+        self.__state.setParameters(self, wd_on, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
 
    
 

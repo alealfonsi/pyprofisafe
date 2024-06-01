@@ -15,7 +15,7 @@ class Wait_CfgState(SlaveState):
         #TO-DO
         """"""
     
-    def setParameters(self, slave, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
+    def setParameters(self, slave, wd_on, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         slave.wd_limit = watchdog_ms
         slave.watchdog = TimeLimitMilliseconds(watchdog_ms)
         slave.slave_reaction_time = slave_reaction_time

@@ -25,7 +25,7 @@ class ProfibusTest(TestCase):
         #slave.setState(Wait_PrmState(slave))
         #parameterization
         slave.setAddress(0)
-        slave.setParameters(600000, 100, False, False, 0, 111, "first")
+        slave.setParameters(True, 600000, 100, False, False, 0, 111, "first")
         slave.setState(Data_ExchState())
         
         out_du = bytearray()
