@@ -547,7 +547,7 @@ class DpMaster(DpMasterInterface):
 			slave.slaveDesc.chkCfgTelegram.sa = self.masterAddr
 			ok = self._send(slave,
 					 telegram=slave.slaveDesc.chkCfgTelegram,
-					 timeout=0.05)
+					 timeout=10)
 			if not ok:
 				self._debugMsg("Chk_Cfg failed")
 				return None
