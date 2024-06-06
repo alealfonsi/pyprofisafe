@@ -25,6 +25,7 @@ class Wait_CfgState(SlaveState):
                                      Telegram: %s""" % (slave.getId(), telegram))
             
         elif DpTelegram_SetPrm_Req.checkType(telegram):
+            print("SetPrm request received while in ChkCfg State")
             """TO-DO"""
         
         else:
@@ -32,6 +33,7 @@ class Wait_CfgState(SlaveState):
                                  telegram: %s""" % (slave.getId()), telegram)
 
     def __checkConfiguration(self, conf):
+        
         """TO-DO"""
         return True
     

@@ -21,6 +21,7 @@ class Wait_PrmState(SlaveState):
 
         parameters: bytearray = telegram.getDU()
         station_status = parameters[0]
+        #TO-DO check that the parameters match the types
         self.setParameters(
             slave,
             station_status & telegram.STA_WD,

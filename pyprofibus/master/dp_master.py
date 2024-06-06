@@ -503,7 +503,7 @@ class DpMaster(DpMasterInterface):
 					 telegram=DpTelegram_SlaveDiag_Req(
 						da=slave.slaveDesc.slaveAddr,
 						sa=self.masterAddr),
-					 timeout=0.05)
+					 timeout=10)
 			if not ok:
 				self._debugMsg("SlaveDiag_Req failed")
 				return None

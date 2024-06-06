@@ -18,6 +18,7 @@ class FailSafeProfibusState(SlaveState):
     def __init__(self, slave):
         self.__setFailSafeProcessVariables()
         self.__clearOutputs()
+        self.__sendRequestDiagnosticTelegram()
         self.need_reparameterization = slave.wd_expired
         print("Slave " + slave.getId() + " is entering fail safe state (Profibus)")
     
@@ -71,6 +72,14 @@ class FailSafeProfibusState(SlaveState):
         if not DpTelegram_DataExchange_Con.checkType(telegram):
             raise SlaveException()
         return True
+
+    def __sendRequestDiagnosticTelegram(self, slave):
+        send_telegram = DpTelegram_DataExchange_Con(da=slave.getMasterAddress(),
+                                                    sa=slave.address,
+                                                    fc=FdlTelegram.FC_RDH,
+                                                    du=bytearray(0x00, 0x00))
+        slave.send(send_telegram)
+
 
     def setAddress(self, slave, address):
         raise SlaveException("Slave " + str(slave.getId()) + " is in Wait Parameterization state, can't accept address setting telegram!")
