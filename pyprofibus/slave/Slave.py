@@ -68,6 +68,7 @@ class Slave(SlaveInterface):
     def watchdogExpired(self):
         self.wd_expired = True
         self.__state = FailSafeProfibusState(self)
+        self.__state.enterFailSafeState(self)
         self.watchdog = None
         raise WatchdogExpiredException("Slave " + self.id + ": watchdog expired!")
 

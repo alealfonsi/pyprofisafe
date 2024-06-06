@@ -3,6 +3,7 @@ from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
 from pyprofibus.slave.Wait_PrmState import Wait_PrmState
+import pyprofibus.slave
 
 
 class FailSafeProfibusState(SlaveState):
@@ -16,11 +17,15 @@ class FailSafeProfibusState(SlaveState):
         return cls._self
     
     def __init__(self, slave):
-        self.__setFailSafeProcessVariables()
-        self.__clearOutputs()
-        self.__sendRequestDiagnosticTelegram()
         self.need_reparameterization = slave.wd_expired
         print("Slave " + slave.getId() + " is entering fail safe state (Profibus)")
+    
+    def enterFailSafeState(self, slave):
+        self.__setFailSafeProcessVariables()
+        self.__clearOutputs()
+        if self.need_reparameterization:
+            self.__sendRequestDiagnosticTelegram(slave)
+
     
     def checkTelegram(self, slave, telegram):
         if self.need_reparameterization == True:
@@ -36,7 +41,7 @@ class FailSafeProfibusState(SlaveState):
             return self.__check(telegram)
     
     def __check(self, slave, telegram):
-        from pyprofibus.slave.Data_ExchState import Data_ExchState
+        #from pyprofibus.slave.Data_ExchState import Data_ExchState
 
         if DpTelegram_DataExchange_Req.checkType(telegram):
             for b in telegram.getDU():
@@ -52,7 +57,7 @@ class FailSafeProfibusState(SlaveState):
                 raise SlaveException("Slave " + str(slave.getId()) + """
                                      is in Fail safe mode but received a global control telegram
                                      whose command is not CCMD_OPERATE.\n Telegram: %s""" % str(telegram))
-            slave.setState(Data_ExchState())
+            slave.setState(pyprofibus.slave.Data_ExchState())
             slave.setRxTelegram(telegram)
             return True
         else:
@@ -65,7 +70,7 @@ class FailSafeProfibusState(SlaveState):
         send_telegram = DpTelegram_DataExchange_Con(da=slave.getMasterAddress(),
                                                     sa=slave.address,
                                                     fc=FdlTelegram.FC_OK,
-                                                    du=bytearray(0x00, 0x00))
+                                                    du=bytearray((0x00, 0x00)))
         slave.send(send_telegram)
     
     def checkTelegramToSend(self, slave, telegram):
@@ -77,7 +82,7 @@ class FailSafeProfibusState(SlaveState):
         send_telegram = DpTelegram_DataExchange_Con(da=slave.getMasterAddress(),
                                                     sa=slave.address,
                                                     fc=FdlTelegram.FC_RDH,
-                                                    du=bytearray(0x00, 0x00))
+                                                    du=bytearray((0x00, 0x00)))
         slave.send(send_telegram)
 
 
