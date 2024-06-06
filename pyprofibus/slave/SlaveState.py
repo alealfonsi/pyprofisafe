@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import time
 
 from pyprofibus.dp.dp import DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlFCB, FdlTelegram, FdlTransceiver
@@ -18,10 +19,13 @@ class SlaveState(ABC):
 			((telegram.da == self.getAddress(slave)) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
 				if self.checkTelegram(slave, telegram):
 					slave.resetWatchdog()
+					print("""XXX| Slave %s in state %s received frame of type %s at time: %d\n
+                      XXX| %s""" % (slave.getId(), self.__class__, telegram.__class__, time.time(), telegram))
 					return True
 		else:
 			if telegram:
-				print("Received corrupt telegram:\n%s" % str(telegram))
+				print("XXX| Slave %s in state %s received corrupt telegram at time: %d\nXXX| %s" 
+		  			% (slave.getId(), self.__class__, time.time(), telegram))
 			return False
 		
 	def send(self, slave, telegram, dpTrans):

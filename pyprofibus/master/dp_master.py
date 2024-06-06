@@ -772,6 +772,8 @@ class DpMaster(DpMasterInterface):
 			self._debugMsg("RX error: %s" % str(e))
 			return
 		if ok and telegram:
+			print("XXX| Master received frame of type %s at time: %d\nXXX| %s" 
+		 		% (telegram.__class__, time.time(), telegram))
 			if FdlTelegram_token.checkType(telegram):
 				pass#TODO handle token
 			elif FdlTelegram_ack.checkType(telegram):
@@ -786,16 +788,16 @@ class DpMaster(DpMasterInterface):
 					slave.rxQueue.append(telegram)
 					slave.fcb.handleReply()
 				else:
-					self._debugMsg("Received telegram from "
-						"unknown station %d:\n%s" %(
-						telegram.sa, str(telegram)))
+					self._debugMsg("XXX| Master received telegram from "
+						"unknown station %d at time: %d\nXXX| %s" %(
+						telegram.sa, time.time(), telegram))
 			else:
 				self._debugMsg("Received telegram for "
 					"foreign station:\n%s" % str(telegram))
 		else:
 			if telegram:
-				self._debugMsg("Received corrupt "
-					"telegram:\n%s" % str(telegram))
+				self._debugMsg("XXX| Master received corrupt "
+					"telegram at time: %d\nXXX| %s" % (time.time(), telegram))
 
 	def __handleMcastTelegram(self, telegram):
 		self._debugMsg("Received multicast telegram:\n%s" % str(telegram))
