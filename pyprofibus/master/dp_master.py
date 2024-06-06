@@ -9,6 +9,7 @@
 #
 
 from __future__ import division, absolute_import, print_function, unicode_literals
+import time
 from pyprofibus.compat import *
 
 from pyprofibus.fieldbus_data_link.fdl import *
@@ -421,6 +422,8 @@ class DpMaster(DpMasterInterface):
 				transceiver = self.fdlTrans
 			else:
 				transceiver = self.dpTrans
+			print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
+		 			% (telegram.__class__, time.time(), telegram))
 			transceiver.send(fcb=slave.fcb,
 					 telegram=telegram)
 		except ProfibusError as e:

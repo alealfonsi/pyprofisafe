@@ -61,6 +61,8 @@ class Slave(SlaveInterface):
     def send(self, telegram):
         while not self.reaction_timer.exceed():
             time.sleep(0.01)
+        print("XXX| Slave %s in state %s sends frame of type [%s] at time: %d\nXXX| %s"
+              % (self.id, self.__state.__class__, telegram.__class__, time.time(), telegram))
         return self.__state.send(self, telegram, self.dpTrans)
     
     def watchdogExpired(self):
