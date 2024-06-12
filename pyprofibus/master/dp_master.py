@@ -32,7 +32,7 @@ class DpSlaveState(DpSlaveStateInterface):
 	"""Run time state of a DP slave that is managed by a DPM instance.
 	"""
 
-	_STATE_INVALID	= -1
+	STATE_INVALID	= -1
 	STATE_INIT	= 0 # Initialize
 	STATE_WDIAG	= 1 # Wait for diagnosis
 	STATE_WPRM	= 2 # Wait for Prm telegram
@@ -41,7 +41,7 @@ class DpSlaveState(DpSlaveStateInterface):
 	STATE_DX	= 5 # Data_Exchange
 
 	state2name = {
-		_STATE_INVALID	: "Invalid",
+		STATE_INVALID	: "Invalid",
 		STATE_INIT	: "Init",
 		STATE_WDIAG	: "Wait for diag",
 		STATE_WPRM	: "Wait for Prm",
@@ -52,12 +52,13 @@ class DpSlaveState(DpSlaveStateInterface):
 
 	# State timeouts in seconds
 	stateTimeLimits = {
-		STATE_INIT	: TimeLimit.UNLIMITED,
-		STATE_WDIAG	: 1.0,
-		STATE_WPRM	: 0.5,
-		STATE_WCFG	: 0.5,
+		STATE_INVALID	: TimeLimit.UNLIMITED,
+		STATE_INIT		: TimeLimit.UNLIMITED,
+		STATE_WDIAG		: 1.0,
+		STATE_WPRM		: 0.5,
+		STATE_WCFG		: 0.5,
 		STATE_WDXRDY	: 1.0,
-		STATE_DX	: 0.5,
+		STATE_DX		: 0.5,
 	}
 
 	__slots__ = (
@@ -87,9 +88,9 @@ class DpSlaveState(DpSlaveStateInterface):
 		# Fault counter
 		self.faultDeb = FaultDebouncer()
 
-		self.__state = self._STATE_INVALID
-		self.__nextState = self._STATE_INVALID
-		self.__prevState = self._STATE_INVALID
+		self.__state = self.STATE_INVALID
+		self.__nextState = self.STATE_INVALID
+		self.__prevState = self.STATE_INVALID
 		self.__stateTimeout = TimeLimit()
 
 		# Context for FC-Bit toggeling
@@ -742,8 +743,8 @@ class DpMaster(DpMasterInterface):
 		DpSlaveState.STATE_DX		: _runSlave_dataExchange,
 	}
 
-	def __runSlave(self, slave):
-		self.__pollRx()
+	def _runSlave(self, slave):
+		self._pollRx()
 		if not self.__haveToken:
 			return None
 
@@ -751,7 +752,7 @@ class DpMaster(DpMasterInterface):
 			self._debugMsg("State machine timeout! "
 				"Trying to re-initializing slave %d..." %\
 				slave.slaveDesc.slaveAddr)
-			slave.setState(slave.STATE_INIT)
+			slave.setState(slave.STATE_INIT) 
 			dataExInData = None
 		else:
 			handler = self._slaveStateHandlers[slave.getState()]
@@ -765,7 +766,7 @@ class DpMaster(DpMasterInterface):
 
 		return dataExInData
 
-	def __pollRx(self):
+	def _pollRx(self):
 		try:
 			ok, telegram = self.dpTrans.poll()
 		except ProfibusError as e:
@@ -834,7 +835,7 @@ class DpMaster(DpMasterInterface):
 		self.__runNextSlaveIndex = (runNextSlaveIndex + 1) % len(slaveDescsList)
 
 		slave = self.__slaveStates[slaveDesc.slaveAddr]
-		fromSlaveData = self.__runSlave(slave)
+		fromSlaveData = self._runSlave(slave)
 		if (fromSlaveData is not None and
 		    len(fromSlaveData) != slaveDesc.outputSize):
 			self.__errorMsg("Slave %d: The received data size (%d bytes) "

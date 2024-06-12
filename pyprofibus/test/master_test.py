@@ -58,7 +58,7 @@ class TestMaster(TestCase):
             return 1
         return 0
     
-    @unittest.skip("skipping first test")
+    @unittest.skip("Skipping cyclic communication test")
     def testCyclicCommunicationMaster(self):
         c = 0
 
@@ -83,11 +83,14 @@ class TestMaster(TestCase):
                         self.outData[handledSlaveDesc.name][1] = inData[1] + 1
 
 
+    #@unittest.skip("Skipping enter clear mode test")
+    # THE MASTER IS CORRECTLY TRYING TO REPARAMETERIZE THE SLAVE, BUT IT IS NOT GOING
+    # TO THE CLEAR MODE AND SO NOT EVEN SENDING THE GLOBAL CONTROL TELEGRAM!
     def testEnterClearModeMaster(self):
          self.assertFalse(self.master.clear_mode)
          desc = self.master.getSlaveList()
          desc[0].setMasterOutData(bytearray((0x00, 0x00)))
-         for i in range(200):
+         for i in range(400):
             self.master.run()
             time.sleep(0.1)
          self.assertTrue(self.master.clear_mode)

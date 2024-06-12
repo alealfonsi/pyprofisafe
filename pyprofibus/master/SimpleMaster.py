@@ -22,7 +22,7 @@ class SimpleMaster(DpMaster):
 		    DpSlaveState.STATE_WCFG		: self._runSlave_waitCfg,
 		    DpSlaveState.STATE_WDXRDY	: self._runSlave_waitDxRdy,
 		    DpSlaveState.STATE_DX		: self._runSlave_dataExchange,
-            DpSlaveState._STATE_INVALID : self._runSlave_invalid
+            DpSlaveState.STATE_INVALID : self._runSlave_invalid
     	}   
         self.clear_mode = False
         self.have_error_pool = []
@@ -147,18 +147,18 @@ class SimpleMaster(DpMaster):
         for s in self._DpMaster__slaveDescsList:
             slave_state = self._DpMaster__slaveStates[s.slaveAddr]
             if slave_state.getState() == slave_state.STATE_DX:
-                slave_state.setState(slave_state._STATE_INVALID, -1)
+                slave_state.setState(slave_state.STATE_INVALID, -1)
         
         self.clear_mode = True
         # It is actually not necessary to manage the clear mode as a state of the master
         # because his behaviour will just be driven by the state of the slaves,
         # in fact the master in this mode will just communicate 0s to the slaves
-        # in data exchange mode (see __runSlave_invalid) or try to reparameterize
+        # in data exchange mode (see _runSlave_invalid) or try to reparameterize
         # the slaves that created problems
                 
     
     # Since we are now managing the clear mode and fail safe state for the slaves,
-    # we need to add the handler for the state _STATE_INVALID, the only missing in 
+    # we need to add the handler for the state STATE_INVALID, the only missing in 
     # the parent code, and this is done in the __init__ method of this class.
     # This method is the handler for the communication when a slave is in fail safe mode,
     # that is just sending frames with payload = 0x00, 0x00, just if it was in the standard
@@ -227,9 +227,8 @@ class SimpleMaster(DpMaster):
             else:
                 # No data or ACK received from slave.
                 if slave.pendingReqTimeout.exceed():
-                    self._debugMsg("Data_Exchange timeout with slave %d" % (
+                    self._debugMsg("Re-parameterization timeout with slave %d" % (
                             slave.slaveDesc.slaveAddr))
-                    self.have_error_pool.append(slave.slaveDesc.slaveAddr)
                     slave.pendingReq = None
             
         else:
@@ -281,7 +280,7 @@ class SimpleMaster(DpMaster):
         
         for s in self._DpMaster__slaveDescsList:
             slave_state = self._DpMaster__slaveStates[s.slaveAddr]
-            if slave_state.getState() != slave_state._STATE_INVALID:
+            if slave_state.getState() != slave_state.STATE_INVALID:
                 self._debugMsg("""Slave %d was expected to be in fail safe state
                                  but was not (ignoring)""" % (s.slaveAddr))
                 continue
@@ -289,7 +288,26 @@ class SimpleMaster(DpMaster):
                 continue
             slave_state.setState(slave.STATE_DX, 10)
         
-        self.clear_mode = False        
+        self.clear_mode = False
 
-
+    def _runSlave(self, slave):
+        self._pollRx()
         
+        if slave.stateHasTimeout():
+            self._debugMsg("State machine timeout! "
+			    "Trying to re-initializing slave %d..." %\
+			    slave.slaveDesc.slaveAddr)
+            slave.setState(slave.STATE_INVALID)
+            self.have_error_pool.append(slave.slaveDesc.slaveAddr)
+            dataExInData = None
+        else:
+            handler = self._slaveStateHandlers[slave.getState()]
+            dataExInData = handler(self, slave)
+
+            if slave.stateIsChanging():
+                self._debugMsg("slave[%02X].state --> '%s'" % (
+                    slave.slaveDesc.slaveAddr,
+                    slave.state2name[slave.getNextState()]))
+        slave.applyState()
+
+        return dataExInData
