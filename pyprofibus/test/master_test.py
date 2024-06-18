@@ -84,12 +84,10 @@ class TestMaster(TestCase):
 
 
     #@unittest.skip("Skipping enter clear mode test")
-    # THE MASTER IS CORRECTLY TRYING TO REPARAMETERIZE THE SLAVE, BUT IT IS NOT GOING
-    # TO THE CLEAR MODE AND SO NOT EVEN SENDING THE GLOBAL CONTROL TELEGRAM!
     def testEnterClearModeMaster(self):
          self.assertFalse(self.master.clear_mode)
          desc = self.master.getSlaveList()
-         desc[0].setMasterOutData(bytearray((0x00, 0x00)))
+         desc[0].setMasterOutData(bytearray((0x66, 0x66)))
          for i in range(400):
             self.master.run()
             time.sleep(0.1)

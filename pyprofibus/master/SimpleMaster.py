@@ -6,6 +6,7 @@
 # It manages clear and fail safe mode, through global control frames too
 
 import collections
+import time
 from pyprofibus.dp.dp import DpError, DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl, DpTelegram_SetPrm_Req
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.master.dp_master import DpMaster, DpSlaveState
@@ -22,7 +23,7 @@ class SimpleMaster(DpMaster):
 		    DpSlaveState.STATE_WCFG		: self._runSlave_waitCfg,
 		    DpSlaveState.STATE_WDXRDY	: self._runSlave_waitDxRdy,
 		    DpSlaveState.STATE_DX		: self._runSlave_dataExchange,
-            DpSlaveState.STATE_INVALID : self._runSlave_invalid
+            DpSlaveState.STATE_INVALID  : self._runSlave_invalid
     	}   
         self.clear_mode = False
         self.have_error_pool = []
@@ -103,7 +104,9 @@ class SimpleMaster(DpMaster):
                             slave.slaveDesc.slaveAddr))
                     #slave.faultDeb.fault()
                     #********** start new code **********#
-                    self.goToClearMode()
+                    self.have_error_pool.append(slave.slaveDesc.slaveAddr)
+                    if self.clear_mode is not True:
+                        self.goToClearMode()
                     #********** end new code **********#
                     slave.pendingReq = None
         else:
@@ -141,6 +144,8 @@ class SimpleMaster(DpMaster):
         				   sa = self.masterAddr)
         globCtl.controlCommand |= DpTelegram_GlobalControl.CCMD_CLEAR
         globCtl.groupSelect = 0x00 #all slaves
+        print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
+		 			% (globCtl.__class__, time.time(), globCtl))
         self.dpTrans.send(fcb = slave.fcb,
         		  telegram = globCtl)
         
@@ -275,6 +280,8 @@ class SimpleMaster(DpMaster):
         				   sa = self.masterAddr)
         globCtl.controlCommand |= DpTelegram_GlobalControl.CCMD_OPERATE
         globCtl.groupSelect = 0x00 #all slaves
+        print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
+		 			% (globCtl.__class__, time.time(), globCtl))
         self.dpTrans.send(fcb = slave.fcb,
         		  telegram = globCtl)
         
