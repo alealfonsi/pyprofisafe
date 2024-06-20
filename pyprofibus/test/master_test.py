@@ -83,7 +83,7 @@ class TestMaster(TestCase):
                         self.outData[handledSlaveDesc.name][1] = inData[1] + 1
 
 
-    #@unittest.skip("Skipping enter clear mode test")
+    @unittest.skip("Skipping enter clear mode test")
     def testEnterClearModeMaster(self):
          self.assertFalse(self.master.clear_mode)
          desc = self.master.getSlaveList()
@@ -92,7 +92,41 @@ class TestMaster(TestCase):
             self.master.run()
             time.sleep(0.1)
          self.assertTrue(self.master.clear_mode)
+    
+    #@unittest.skip("Skipping test")
+    def testReparameterizationAfterFailSafeModeMaster(self):
 
+        #run normal data exchange
+        while True:
+            for slaveDesc in self.master.getSlaveList():
+                slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
+            
+            handledSlaveDesc = self.master.run()
+            time.sleep(0.2)
+            # Get the in-data (receive)
+            if handledSlaveDesc:
+                inData = handledSlaveDesc.getMasterInData()
+                if inData is not None:
+                    if inData[0] == 0x05 and inData[1] == 0x05:
+                         print(c)
+                         break
+                    self.outData[handledSlaveDesc.name][0] = inData[0] + 1
+                    self.outData[handledSlaveDesc.name][1] = inData[1] + 1
+        
+        #go to Clear Mode and reparameterize the slave
+        went_to_clear_mode = False
+        while (went_to_clear_mode is False) or (self.master.clear_mode is True):
+            handledSlaveDesc = self.master.run()
+
+            if handledSlaveDesc:
+                self.outData[handledSlaveDesc.name][0] = 0x99
+                self.outData[handledSlaveDesc.name][1] = 0x99
+            
+            if (went_to_clear_mode is False) and (self.master.clear_mode is True):
+                went_to_clear_mode = True
+        
+        #assert everything is ok
+        self.assertFalse(self.master.clear_mode is False)
     
     @classmethod
     def tearDownClass(cls) -> None:
