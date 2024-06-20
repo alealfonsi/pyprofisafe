@@ -1,4 +1,5 @@
 import sys
+import time
 sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
@@ -76,9 +77,41 @@ class TestSlave(TestCase):
         except WatchdogExpiredException:
             self.assertTrue(isinstance(self.slave.getState(), FailSafeProfibusState))
 
-    @unittest.skip("Skipping test")  
-    def testReceiveGlobalTelegramForClearMode(self):
-        """"""
+    #@unittest.skip("Skipping test")  
+    def testReparameterizationAfterFailSafeModeSlave(self):
+        out_du = bytearray()
+        
+        # run normal data exchange...
+        for i in range(3):
+            r = self.slave.receive(10)
+            if not r:
+                raise SlaveException("Did't receive anything!")
+            in_du = self.slave.rx_telegram.getDU()
+            if i == 0:
+                out_du.append(in_du[0] + 1)
+                out_du.append(in_du[1] + 1)
+            else:
+                out_du[0] = in_du[0] + 1
+                out_du[1] = in_du[1] + 1
+            send_telegram = DpTelegram_DataExchange_Con(
+                 self.slave.getMasterAddress(),
+                 self.slave.address,
+                 FdlTelegram.FC_OK,
+                 #self.slave.rx_telegram.fc,
+                 out_du
+            )
+            self.slave.send(send_telegram)
+
+        #let the master go to Clear Mode // REMEMEBER TO TRY WITH WATCHDOG EXPIRATION!!!
+        time.sleep(15)
+
+        #receive reparameterization
+        r = self.slave.receive(10)
+        if not r:
+            raise SlaveException("Did't receive reparameterization!")
+        
+        time.sleep(1)
+        self.assertTrue(isinstance(self.slave.getState(), Data_ExchState))
 
     @classmethod
     def tearDownClass(cls):
