@@ -41,7 +41,7 @@ class FailSafeProfibusState(SlaveState):
             return self.__check(telegram)
     
     def __check(self, slave, telegram):
-        #from pyprofibus.slave.Data_ExchState import Data_ExchState
+        from pyprofibus.slave.Data_ExchState import Data_ExchState
 
         if DpTelegram_DataExchange_Req.checkType(telegram):
             for b in telegram.getDU():
@@ -57,7 +57,7 @@ class FailSafeProfibusState(SlaveState):
                 raise SlaveException("Slave " + str(slave.getId()) + """
                                      is in Fail safe mode but received a global control telegram
                                      whose command is not CCMD_OPERATE.\n Telegram: %s""" % str(telegram))
-            slave.setState(pyprofibus.slave.Data_ExchState())
+            slave.setState(Data_ExchState())
             slave.setRxTelegram(telegram)
             return True
         else:

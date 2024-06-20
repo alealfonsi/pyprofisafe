@@ -44,7 +44,10 @@ class Wait_CfgState(SlaveState):
         slave.send(send_telegram)
 
     def setParameters(self, slave, wd_on, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
-        slave.wd_limit = watchdog_ms
+        if wd_on:    
+            slave.wd_limit = watchdog_ms
+        else:
+            slave.wd_limit = -1
         slave.watchdog = TimeLimitMilliseconds(watchdog_ms)
         slave.slave_reaction_time = slave_reaction_time
         slave.reaction_timer = TimeLimitMilliseconds(slave_reaction_time)

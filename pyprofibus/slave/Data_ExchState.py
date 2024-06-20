@@ -28,10 +28,12 @@ class Data_ExchState(SlaveState):
                                       Telegram: %s""" % str(telegram))
     
     def __checkAlarm(self, slave, telegram):
+        from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
+
         if DpTelegram_GlobalControl.checkType(telegram):
             if telegram.controlCommand == DpTelegram_GlobalControl.CCMD_CLEAR:
-                slave.setState(pyprofibus.slave.FailSafeProfibusState(slave))
-                slave.__state.enterFailSafeState(slave)
+                slave.setState(FailSafeProfibusState(slave))
+                slave.getState().enterFailSafeState(slave)
 
     
     def checkTelegramToSend(self, slave, telegram):

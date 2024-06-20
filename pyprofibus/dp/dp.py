@@ -189,6 +189,8 @@ class DpTelegram():
 					return DpTelegram_SetPrm_Req.fromFdlTelegram(fdl)
 				elif dsap == DpTelegram.DSAP_CHK_CFG:
 					return DpTelegram_ChkCfg_Req.fromFdlTelegram(fdl)
+				elif dsap == DpTelegram.DSAP_GLOBAL_CONTROL:
+					return DpTelegram_GlobalControl.fromFdlTelegram(fdl)
 				else:
 					raise DpError("Unknown DSAP: %d" % dsap)
 			else:

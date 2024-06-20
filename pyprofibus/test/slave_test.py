@@ -30,7 +30,7 @@ class TestSlave(TestCase):
             #slave.setState(Wait_PrmState(slave))
             #parameterization
             cls.slave.setAddress(0)
-            cls.slave.setParameters(True, 5000, 100, False, False, 0, 111, "first")
+            cls.slave.setParameters(False, 30000, 100, False, False, 0, 111, "first")
             cls.slave.setState(Data_ExchState())
 
             
@@ -41,7 +41,7 @@ class TestSlave(TestCase):
         
         return 0
 
-    @unittest.skip("Skipping cyclic communication test")
+    #@unittest.skip("Skipping cyclic communication test")
     def testCyclicCommunicationSlave(self):
         out_du = bytearray()
         

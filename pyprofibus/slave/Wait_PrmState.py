@@ -45,9 +45,9 @@ class Wait_PrmState(SlaveState):
     def setParameters(self, slave, wd_on: bool, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         if wd_on:    
             slave.wd_limit = watchdog_ms
-            slave.watchdog = TimeLimitMilliseconds(watchdog_ms)
         else:
             slave.wd_limit = -1
+        slave.watchdog = TimeLimitMilliseconds(watchdog_ms)
         slave.slave_reaction_time = slave_reaction_time
         slave.reaction_timer = TimeLimitMilliseconds(slave_reaction_time)
         slave.freeze_mode_enable = freeze_mode_enable
