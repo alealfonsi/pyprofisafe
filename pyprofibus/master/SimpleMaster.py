@@ -257,8 +257,10 @@ class SimpleMaster(DpMaster):
                                          timeout=10)
                     else:
                         # broken slave, try to reparameterize
+                        param_tg = slave.slaveDesc.setPrmTelegram
+                        param_tg.sa = self.masterAddr
                         ok = self._send(slave,
-                                        telegram=slave.slaveDesc.setPrmTelegram,
+                                        telegram=param_tg,
                                         timeout=10)
                     if ok:
                         # We sent it. Reset the data.

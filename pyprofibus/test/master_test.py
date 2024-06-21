@@ -39,8 +39,9 @@ class TestMaster(TestCase):
                 dp1PrmSet  = bytearray((DpTelegram_SetPrm_Req.DPV1PRM0_FAILSAFE,
                                         DpTelegram_SetPrm_Req.DPV1PRM1_REDCFG,
                                         0x00))
-                slaveDesc.setUserPrmData(slaveConf.gsd.getUserPrmData(dp1PrmMask=dp1PrmMask,
-                                                                      dp1PrmSet=dp1PrmSet))
+                prms = slaveConf.gsd.getUserPrmData(dp1PrmMask=dp1PrmMask, dp1PrmSet=dp1PrmSet)
+                slaveDesc.setUserPrmData(prms)
+                slaveDesc.setPrmTelegram.stationStatus = DpTelegram_SetPrm_Req.STA_LOCK
 
                 # Register the slave at the DPM
                 master.addSlave(slaveDesc, 600)
@@ -107,13 +108,13 @@ class TestMaster(TestCase):
             if handledSlaveDesc:
                 inData = handledSlaveDesc.getMasterInData()
                 if inData is not None:
-                    if inData[0] == 0x05 and inData[1] == 0x05:
-                         print(c)
+                    if inData[0] == 0x01 and inData[1] == 0x01:
                          break
                     self.outData[handledSlaveDesc.name][0] = inData[0] + 1
                     self.outData[handledSlaveDesc.name][1] = inData[1] + 1
         
         #go to Clear Mode and reparameterize the slave
+
         went_to_clear_mode = False
         while (went_to_clear_mode is False) or (self.master.clear_mode is True):
             handledSlaveDesc = self.master.run()
