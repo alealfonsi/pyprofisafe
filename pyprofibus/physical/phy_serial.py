@@ -97,13 +97,14 @@ class CpPhySerial(CpPhy):
 		self.__rxBuf = bytearray()
 		super(CpPhySerial, self).close()
 
-	def __discard(self):
+	def discard(self):
 		s = self.__serial
 		if s:
 			s.flushInput()
 			s.flushOutput()
-		if monotonic_time() >= self.__discardTimeout:
-			self.__discardTimeout = None
+		if self.__discardTimeout is not None:
+			if monotonic_time() >= self.__discardTimeout:
+				self.__discardTimeout = None
 
 	def __startDiscard(self):
 		self.__discardTimeout = monotonic_time() + 0.01
@@ -120,7 +121,7 @@ class CpPhySerial(CpPhy):
 		getSize = FdlTelegram.getSizeFromRaw
 
 		while self.__discardTimeout is not None:
-			self.__discard()
+			self.discard()
 			if timeout > 0.0 and monotonic_time() >= timeoutStamp:
 				return None
 

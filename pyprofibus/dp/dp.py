@@ -64,7 +64,10 @@ class DpTransceiver():
 
 	# Send a DpTelegram.
 	def send(self, fcb, telegram):
-		self.fdlTrans.send(fcb, telegram.toFdlTelegram())
+		if DpTelegram.checkType(telegram):
+			self.fdlTrans.send(fcb, telegram.toFdlTelegram())
+		else:
+			self.fdlTrans.send(fcb, telegram)
 
 class DpTelegram():
 	# Source Service Access Point number

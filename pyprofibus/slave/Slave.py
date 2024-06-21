@@ -1,7 +1,7 @@
 import time
 from pyprofibus.dp.dp import DpTelegram, DpTelegram_GlobalControl, DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlTransceiver
-from pyprofibus.physical.phy_interface import CpPhyInterface
+from pyprofibus.physical.phy_serial import CpPhySerial
 from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
 from pyprofibus.slave.ResetState import ResetState
 from pyprofibus.slave.SlaveException import WatchdogExpiredException
@@ -28,7 +28,7 @@ class Slave(SlaveInterface):
     id: str
 
     #transceivers
-    phy: CpPhyInterface
+    phy: CpPhySerial
     fdlTrans: FdlTransceiver
     dpTrans: DpTransceiver
 
@@ -40,6 +40,7 @@ class Slave(SlaveInterface):
 
     def __init__(self, phy) -> None:
         super().__init__()
+        self.phy = phy
         self.fdlTrans = FdlTransceiver(phy)
         self.dpTrans = DpTransceiver(self.fdlTrans, thisIsMaster=False)
 
@@ -93,6 +94,9 @@ class Slave(SlaveInterface):
     def setAddress(self, address):
         self.__state.setAddress(self, address)
     
+    def getAddress(self):
+        return self.address
+    
     def getDpTrans(self):
         return self.dpTrans
     
@@ -101,7 +105,6 @@ class Slave(SlaveInterface):
 
     def setParameters(self, wd_on: bool, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         self.__state.setParameters(self, wd_on, watchdog_ms, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id)
-
    
 
 

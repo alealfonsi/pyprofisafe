@@ -38,7 +38,7 @@ class FailSafeProfibusState(SlaveState):
                                      is in Fail safe mode and needs reparameterization but
                                      didn't receive the proper tg.\n Telegram: %s""" % str(telegram))
         else:
-            return self.__check(telegram)
+            return self.__check(slave, telegram)
     
     def __check(self, slave, telegram):
         from pyprofibus.slave.Data_ExchState import Data_ExchState
@@ -60,6 +60,9 @@ class FailSafeProfibusState(SlaveState):
             slave.setState(Data_ExchState())
             slave.setRxTelegram(telegram)
             return True
+        elif DpTelegram_SetPrm_Req.checkType(telegram):
+                slave.setState(Wait_PrmState())
+                return slave.getState().checkTelegram(slave, telegram)
         else:
              raise SlaveException("Slave " + str(slave.getId()) + """ is in 
                                       Fail safe mode and received a proper telegram at the fdl level 
