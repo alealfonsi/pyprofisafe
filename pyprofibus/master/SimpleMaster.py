@@ -175,10 +175,6 @@ class SimpleMaster(DpMaster):
                 if b != '\x00':
                     self._debugMsg("Received %b data different from 0 from slave %d but master is in Clear Mode" % (b, slave.slaveDesc.slaveAddr))
                     raise ProfibusError("Received data different from 0 but master is in Clear Mode")
-        if slave.shortAckReceived and (slave.slaveDesc.slaveAddr in self.have_error_pool):
-            self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
-            slave.setState(slave.STATE_WCFG, 5)
-            self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
         if len(self.have_error_pool) == 0:
             self.exitClearMode()
         return dataExInData
@@ -217,12 +213,13 @@ class SimpleMaster(DpMaster):
                             raise DpError("Service not active "
                                           "on slave %d" % slave.slaveDesc.slaveAddr)
                         dataExInData = telegram.getDU()
-                    #CASE: broken slave, check if answered the set prm request
-                    else:
-                        if slave.shortAckReceived():
-                            self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
-                            slave.setState(slave.STATE_WCFG)
-
+                    ##CASE: broken slave, check if answered the set prm request
+                    #else:
+                    #    if slave.shortAckReceived():
+                    #        self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+                    #        slave.setState(slave.STATE_WCFG)
+            if slave.slaveDesc.slaveAddr in self.have_error_pool:
+                self._repairSlaveRoutine(slave)
             if (dataExInData is not None or
                 (slaveOutputSize == 0 and slave.shortAckReceived)):
                 # We received some data or an ACK (input-only slave).
@@ -271,6 +268,37 @@ class SimpleMaster(DpMaster):
                         self._debugMsg("DataExchange_Req failed")
                         slave.faultDeb.fault()
         return dataExInData
+    
+    def _repairSlaveRoutine(self, slave):
+        if slave.shortAckReceived:
+            self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
+            slave.shortActReceive = False
+        else:
+            return
+
+        slave.slaveDesc.chkCfgTelegram.sa = self.masterAddr
+        ok = self._send(slave,
+                        telegram=slave.slaveDesc.chkCfgTelegram,
+                        timeout=10)
+        if ok:
+            # This sleep blocks the master on the reparameterization of the broken slave,
+            # potentially causing the other slaves' watchdog to expire. 
+            # So it has to be considered as a temporary solution
+            time.sleep(10)
+        else:
+            self._debugMsg("Couldn't send reconfiguration telegram")
+            return
+        for telegram in slave.getRxQueue():
+            if slave.shortAckReceived:
+                self._debugMsg("XXX| Slave %d has been reconfigured and is back to work!"
+                               % slave.slaveDesc.slaveAddr)
+                self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+
+        # Remove slave from error pool and set state
+        self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+        slave.setState(slave.STATE_DX, 5)
+        self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
+
     
     # This method is called when all the slaves are working correctly, after the master
     # going to Clear Mode. All the slaves are switched back to the data exchange state,
