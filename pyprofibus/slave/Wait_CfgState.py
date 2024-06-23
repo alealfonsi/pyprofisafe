@@ -29,8 +29,8 @@ class Wait_CfgState(SlaveState):
             """TO-DO"""
         
         else:
-            raise SlaveException("""Slave %d is waiting for configuration check but received 
-                                 telegram: %s""" % (slave.getId()), telegram)
+            raise SlaveException("""Slave %s is waiting for configuration check but received 
+                                 telegram: %s""" % (str(slave.getId()), telegram))
 
     def __checkConfiguration(self, conf):
         

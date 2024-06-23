@@ -79,7 +79,9 @@ class TestSlave(TestCase):
 
     #@unittest.skip("Skipping test")  
     def testReparameterizationAfterFailSafeModeSlave(self):
-        #THE MASTER IS NOT WELL RECEIVING THE ACK TELEGRAM
+        #AFTER THE SLAVE GETS REPARAMETERIZED, IT WILL RECEIVE THE GLOBAL CONTROL TG
+        # THAT MASTER GOES BACK TO OPERATIONAL MODE, BUT THIS IS NOT EXPECTED IN THE
+        # CHECK TELEGRAM METHOD!
         out_du = bytearray()
         
         # run normal data exchange...

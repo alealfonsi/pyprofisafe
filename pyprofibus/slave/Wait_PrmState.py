@@ -16,7 +16,7 @@ class Wait_PrmState(SlaveState):
 
     def checkTelegram(self, slave, telegram):
         if not DpTelegram_SetPrm_Req.checkType(telegram):
-            raise SlaveException("""Slave %d is waiting for parameterization but received 
+            raise SlaveException("""Slave %s is waiting for parameterization but received 
                                  telegram: %s""" % (slave.getId()), telegram)
 
         parameters: bytearray = telegram.getDU()
