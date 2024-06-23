@@ -175,12 +175,13 @@ class SimpleMaster(DpMaster):
                 if b != '\x00':
                     self._debugMsg("Received %b data different from 0 from slave %d but master is in Clear Mode" % (b, slave.slaveDesc.slaveAddr))
                     raise ProfibusError("Received data different from 0 but master is in Clear Mode")
-            if slave.slaveDesc.slaveAddr in self.have_error_pool:
-                self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+        if slave.shortAckReceived and (slave.slaveDesc.slaveAddr in self.have_error_pool):
+            self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
+            slave.setState(slave.STATE_WCFG, 5)
+            self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
         if len(self.have_error_pool) == 0:
-                    self.exitClearMode()
+            self.exitClearMode()
         return dataExInData
-
 
     def _run_invalid(self, slave):
         dataExInData = None
@@ -289,11 +290,12 @@ class SimpleMaster(DpMaster):
         
         for s in self._DpMaster__slaveDescsList:
             slave_state = self._DpMaster__slaveStates[s.slaveAddr]
+            if slave_state.getState() == slave_state.STATE_WCFG:
+                continue
             if slave_state.getState() != slave_state.STATE_INVALID:
                 self._debugMsg("""Slave %d was expected to be in fail safe state
+                                or waiting for re-configuration
                                  but was not (ignoring)""" % (s.slaveAddr))
-                continue
-            if slave_state.getState() == slave_state.STATE_WCFG:
                 continue
             slave_state.setState(slave.STATE_DX, 10)
         

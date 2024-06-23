@@ -127,7 +127,11 @@ class TestMaster(TestCase):
                 went_to_clear_mode = True
         
         #assert everything is ok
-        self.assertFalse(self.master.clear_mode is False)
+        self.assertFalse(self.master.clear_mode)
+
+        #run to reconfigure the slave
+        while True:
+            self.master.run()
     
     @classmethod
     def tearDownClass(cls) -> None:
