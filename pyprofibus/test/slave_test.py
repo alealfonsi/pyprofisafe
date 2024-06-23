@@ -79,9 +79,9 @@ class TestSlave(TestCase):
 
     #@unittest.skip("Skipping test")  
     def testReparameterizationAfterFailSafeModeSlave(self):
-        #AFTER THE SLAVE GETS REPARAMETERIZED, IT WILL RECEIVE THE GLOBAL CONTROL TG
-        # THAT MASTER GOES BACK TO OPERATIONAL MODE, BUT THIS IS NOT EXPECTED IN THE
-        # CHECK TELEGRAM METHOD!
+        # IT SEEMS THAT BOTH FOR MASTER AND SLAVE THE RECONFIGURATION IS WORKING GOOD,
+        # BUT THEN THE MASTER SENDS AGAIN SETPRM TELEGRAM AND THE SLAVE, SINCE IS IN
+        # DATA EXCHANGE STATE, BREAKS!
         out_du = bytearray()
         
         # run normal data exchange...

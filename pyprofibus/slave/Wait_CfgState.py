@@ -1,5 +1,5 @@
 from pyprofibus.dp.dp import DpTelegram_ChkCfg_Req, DpTelegram_SetPrm_Req
-from pyprofibus.fieldbus_data_link.fdl import FdlTelegram_ack
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTelegram_ack
 from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.slave.SlaveState import SlaveState
@@ -39,8 +39,9 @@ class Wait_CfgState(SlaveState):
     
     def sendResponse(self, slave):
         send_telegram = FdlTelegram_ack()
-        send_telegram.da = slave.master_address
+        send_telegram.da = slave.master_add
         send_telegram.sa = slave.getAddress()
+        send_telegram.fc = FdlTelegram.FC_OK
         slave.send(send_telegram)
 
     def setParameters(self, slave, wd_on, watchdog_ms: int, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
