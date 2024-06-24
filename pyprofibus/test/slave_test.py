@@ -6,7 +6,7 @@ from pyprofibus.fieldbus_data_link.fdl import FdlError, FdlTelegram
 from pyprofibus.slave.FailSafeProfibusState import FailSafeProfibusState
 
 import pyprofibus
-from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
+from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_GlobalControl
 from pyprofibus.physical.phy_serial import CpPhySerial
 from pyprofibus.slave.Data_ExchState import Data_ExchState
 from pyprofibus.slave.ResetState import ResetState
@@ -89,21 +89,22 @@ class TestSlave(TestCase):
             r = self.slave.receive(10)
             if not r:
                 raise SlaveException("Did't receive anything!")
-            in_du = self.slave.rx_telegram.getDU()
-            if i == 0:
-                out_du.append(in_du[0] + 1)
-                out_du.append(in_du[1] + 1)
-            else:
-                out_du[0] = in_du[0] + 1
-                out_du[1] = in_du[1] + 1
-            send_telegram = DpTelegram_DataExchange_Con(
-                 self.slave.getMasterAddress(),
-                 self.slave.address,
-                 FdlTelegram.FC_OK,
-                 #self.slave.rx_telegram.fc,
-                 out_du
-            )
-            self.slave.send(send_telegram)
+            if not DpTelegram_GlobalControl.checkType(self.slave.rx_telegram):
+                in_du = self.slave.rx_telegram.getDU()
+                if i == 0:
+                    out_du.append(in_du[0] + 1)
+                    out_du.append(in_du[1] + 1)
+                else:
+                    out_du[0] = in_du[0] + 1
+                    out_du[1] = in_du[1] + 1
+                send_telegram = DpTelegram_DataExchange_Con(
+                     self.slave.getMasterAddress(),
+                     self.slave.address,
+                     FdlTelegram.FC_OK,
+                     #self.slave.rx_telegram.fc,
+                     out_du
+                )
+                self.slave.send(send_telegram)
 
         #let the master go to Clear Mode // REMEMEBER TO TRY WITH WATCHDOG EXPIRATION!!!
         time.sleep(8)
@@ -114,10 +115,33 @@ class TestSlave(TestCase):
         self.slave.receive(2)
         self.slave.phy.discard()
         #receive reparameterization
-        for i in range(50):
-            self.slave.receive(2)
-        #if not r:
-        #    raise SlaveException("Did't receive reparameterization!")
+        while True:
+            try:
+                self.slave.receive(2)
+                if isinstance(self.slave.getState(), Data_ExchState):
+                    break
+            except Exception as e:
+                print(e)
+            
+        # run normal data exchange...
+        for i in range(10):
+            r = self.slave.receive(10)
+            if not r:
+                raise SlaveException("Did't receive anything!")
+            in_du = self.slave.rx_telegram.getDU()
+            out_du[0] = in_du[0] + 1
+            out_du[1] = in_du[1] + 1
+            send_telegram = DpTelegram_DataExchange_Con(
+                 self.slave.getMasterAddress(),
+                 self.slave.address,
+                 FdlTelegram.FC_OK,
+                 #self.slave.rx_telegram.fc,
+                 out_du
+            )
+            self.slave.phy.discard()
+            #self.slave.send(send_telegram)
+            time.sleep(0.5)
+            self.slave.send(send_telegram)
         
         time.sleep(1)
         self.assertTrue(isinstance(self.slave.getState(), Data_ExchState))

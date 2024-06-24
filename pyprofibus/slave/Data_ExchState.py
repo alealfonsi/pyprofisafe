@@ -37,8 +37,7 @@ class Data_ExchState(SlaveState):
 
     
     def checkTelegramToSend(self, slave, telegram):
-        if (DpTelegram_DataExchange_Con.checkType(telegram)
-            and DpTelegram_DataExchange_Req.checkType(slave.getRxTelegram())):
+        if DpTelegram_DataExchange_Con.checkType(telegram):
              #some other check?
              return
         elif False:
