@@ -27,6 +27,7 @@ class SimpleMaster(DpMaster):
     	}   
         self.clear_mode = False
         self.have_error_pool = []
+        self.waiting_re_conf = []
         
     
     # This method adds a slave in all the data structures used by
@@ -271,34 +272,26 @@ class SimpleMaster(DpMaster):
     
     def _repairSlaveRoutine(self, slave):
         if slave.shortAckReceived:
-            self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
-            slave.shortActReceive = False
-        else:
-            return
-
-        slave.slaveDesc.chkCfgTelegram.sa = self.masterAddr
-        ok = self._send(slave,
+            if slave.slaveDesc.slaveAddr not in self.waiting_re_conf:
+                self.waiting_re_conf.append(slave.slaveDesc.slaveAddr)
+                self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
+                slave.slaveDesc.chkCfgTelegram.sa = self.masterAddr
+                ok = self._send(slave,
                         telegram=slave.slaveDesc.chkCfgTelegram,
                         timeout=10)
-        if ok:
-            # This sleep blocks the master on the reparameterization of the broken slave,
-            # potentially causing the other slaves' watchdog to expire. 
-            # So it has to be considered as a temporary solution
-            time.sleep(10)
-        else:
-            self._debugMsg("Couldn't send reconfiguration telegram")
-            return
-        for telegram in slave.getRxQueue():
-            if slave.shortAckReceived:
+                self.phy.discard()
+                if not ok:
+                    self._debugMsg("Couldn't send reconfiguration telegram")
+            elif slave.slaveDesc.slaveAddr in self.waiting_re_conf:
                 self._debugMsg("XXX| Slave %d has been reconfigured and is back to work!"
-                               % slave.slaveDesc.slaveAddr)
+                           % slave.slaveDesc.slaveAddr)
+                self.waiting_re_conf.remove(slave.slaveDesc.slaveAddr)
                 self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
-
-        # Remove slave from error pool and set state
-        self.have_error_pool.remove(slave.slaveDesc.slaveAddr)
-        slave.setState(slave.STATE_DX, 5)
-        self._debugMsg("XXX| Slave %d has been reparameterized!" % slave.slaveDesc.slaveAddr)
-
+                slave.setState(slave.STATE_DX, 100)
+                slave.applyState()
+            else:
+                raise ProfibusError("Something went wrong!")
+         
     
     # This method is called when all the slaves are working correctly, after the master
     # going to Clear Mode. All the slaves are switched back to the data exchange state,
@@ -315,17 +308,21 @@ class SimpleMaster(DpMaster):
 		 			% (globCtl.__class__, time.time(), globCtl))
         self.dpTrans.send(fcb = slave.fcb,
         		  telegram = globCtl)
+        #just to clean
+        #print("CLEANING")
+        #time.sleep(0.5)
+        #self._pollRx()
         
         for s in self._DpMaster__slaveDescsList:
             slave_state = self._DpMaster__slaveStates[s.slaveAddr]
-            if slave_state.getState() == slave_state.STATE_WCFG:
+            if slave_state.getState() == slave_state.STATE_DX:
                 continue
             if slave_state.getState() != slave_state.STATE_INVALID:
                 self._debugMsg("""Slave %d was expected to be in fail safe state
                                 or waiting for re-configuration
                                  but was not (ignoring)""" % (s.slaveAddr))
                 continue
-            slave_state.setState(slave.STATE_DX, 10)
+            slave_state.setState(slave.STATE_DX, 100)
         
         self.clear_mode = False
 

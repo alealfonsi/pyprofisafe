@@ -120,8 +120,8 @@ class TestMaster(TestCase):
             handledSlaveDesc = self.master.run()
 
             if handledSlaveDesc:
-                self.outData[handledSlaveDesc.name][0] = 0x99
-                self.outData[handledSlaveDesc.name][1] = 0x99
+                self.outData[handledSlaveDesc.name][0] = 0x00
+                self.outData[handledSlaveDesc.name][1] = 0x00
             
             if (went_to_clear_mode is False) and (self.master.clear_mode is True):
                 went_to_clear_mode = True
@@ -131,7 +131,19 @@ class TestMaster(TestCase):
 
         #run to reconfigure the slave
         while True:
-            self.master.run()
+            for slaveDesc in self.master.getSlaveList():
+                slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
+            
+            handledSlaveDesc = self.master.run()
+            time.sleep(0.2)
+            # Get the in-data (receive)
+            if handledSlaveDesc:
+                inData = handledSlaveDesc.getMasterInData()
+                if inData is not None:
+                    if inData[0] == 0x03 and inData[1] == 0x03:
+                         break
+                    self.outData[handledSlaveDesc.name][0] = inData[0] + 1
+                    self.outData[handledSlaveDesc.name][1] = inData[1] + 1
     
     @classmethod
     def tearDownClass(cls) -> None:

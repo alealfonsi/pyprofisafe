@@ -54,11 +54,11 @@ class DpSlaveState(DpSlaveStateInterface):
 	stateTimeLimits = {
 		STATE_INVALID	: TimeLimit.UNLIMITED,
 		STATE_INIT		: TimeLimit.UNLIMITED,
-		STATE_WDIAG		: 1.0,
-		STATE_WPRM		: 0.5,
-		STATE_WCFG		: 0.5,
-		STATE_WDXRDY	: 1.0,
-		STATE_DX		: 0.5,
+		STATE_WDIAG		: TimeLimit.UNLIMITED, #1.0,
+		STATE_WPRM		: TimeLimit.UNLIMITED, #10,
+		STATE_WCFG		: TimeLimit.UNLIMITED, #0.5,
+		STATE_WDXRDY	: TimeLimit.UNLIMITED, #1.0,
+		STATE_DX		: TimeLimit.UNLIMITED, #0.5,
 	}
 
 	__slots__ = (
@@ -530,7 +530,7 @@ class DpMaster(DpMasterInterface):
 			slave.slaveDesc.setPrmTelegram.sa = self.masterAddr
 			ok = self._send(slave,
 					 telegram=slave.slaveDesc.setPrmTelegram,
-					 timeout=0.05)
+					 timeout=10)
 			if not ok:
 				self._debugMsg("Set_Prm failed")
 				return None
