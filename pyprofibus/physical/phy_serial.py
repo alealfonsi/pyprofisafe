@@ -229,3 +229,6 @@ class CpPhySerial(CpPhy):
 		except raspi_hat_conf.PilcConf.Error as e:
 			raise PhyError("Failed to configure PiLC HAT:\n%s" %\
 				str(e))
+	
+	def getSerial(self):
+		return self.__serial
