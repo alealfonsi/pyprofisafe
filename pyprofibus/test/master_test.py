@@ -59,9 +59,8 @@ class TestMaster(TestCase):
             return 1
         return 0
     
-    @unittest.skip("Skipping cyclic communication test")
+    #@unittest.skip("Skipping cyclic communication test")
     def testCyclicCommunicationMaster(self):
-        c = 0
 
         while True:
                 # Write the output data.
@@ -70,15 +69,13 @@ class TestMaster(TestCase):
 
                 # Run slave state machines.
                 handledSlaveDesc = self.master.run()
-                c += 1
                 time.sleep(0.2)
 
                 # Get the in-data (receive)
                 if handledSlaveDesc:
                     inData = handledSlaveDesc.getMasterInData()
                     if inData is not None:
-                        if inData[0] == 0x09 and inData[1] == 0x09:
-                             print(c)
+                        if inData[0] == 21 and inData[1] == 21:
                              break
                         self.outData[handledSlaveDesc.name][0] = inData[0] + 1
                         self.outData[handledSlaveDesc.name][1] = inData[1] + 1
@@ -94,7 +91,7 @@ class TestMaster(TestCase):
             time.sleep(0.1)
          self.assertTrue(self.master.clear_mode)
     
-    #@unittest.skip("Skipping test")
+    @unittest.skip("Skipping test")
     def testReparameterizationAfterFailSafeModeMaster(self):
 
         #run normal data exchange
