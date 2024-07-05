@@ -1,0 +1,2 @@
+class CRC_Generator():
+    
