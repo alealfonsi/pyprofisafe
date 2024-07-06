@@ -1,10 +1,10 @@
 import sys
 
-from pyprofibus.attacker.exploit_profibus import ExploitProfibus
 sys.path.insert(0, "/home/alessio/pyprofisafe")
 import time
 
 import pyprofibus
+from pyprofibus.attacker.exploit_profibus import ExploitProfibus
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.physical.phy_serial import CpPhySerial
@@ -16,7 +16,7 @@ from pyprofibus.slave.SlaveException import SlaveException
 from unittest import TestCase
 import unittest
 
-class TestSlave(TestCase):
+class TestAttacker(TestCase):
 
     phy: CpPhySerial
     slave: Slave
@@ -45,7 +45,8 @@ class TestSlave(TestCase):
         return 0
 
     #@unittest.skip("Skipping test")
-    def testCyclicCommunicationSlave(self):
+    def testAttack(self):
+
         ### normal data exchange with master
         out_du = bytearray()
         
