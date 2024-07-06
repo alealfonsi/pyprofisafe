@@ -61,6 +61,7 @@ class TestMaster(TestCase):
     
     #@unittest.skip("Skipping cyclic communication test")
     def testCyclicCommunicationMaster(self):
+        """"""
 
         while True:
                 # Write the output data.
