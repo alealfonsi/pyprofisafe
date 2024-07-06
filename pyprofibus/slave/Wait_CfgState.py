@@ -16,9 +16,13 @@ class Wait_CfgState(SlaveState):
         return cls._self
 
     def checkTelegram(self, slave, telegram):
+        if not telegram.sa == slave.getMasterAddress():
+            print("Not my master")
+            return False
         if DpTelegram_ChkCfg_Req.checkType(telegram):
             conf = telegram.getDU()
             if self.__checkConfiguration(conf):
+                print("Received reconfiguration")
                 self.sendResponse(slave)
                 slave.setState(Data_ExchState())
             else:

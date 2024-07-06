@@ -23,6 +23,7 @@ class FailSafeProfibusState(SlaveState):
     def enterFailSafeState(self, slave):
         self.__setFailSafeProcessVariables()
         self.__clearOutputs()
+        slave.phy.discard()
         if self.need_reparameterization:
             self.__sendRequestDiagnosticTelegram(slave)
 
@@ -31,8 +32,9 @@ class FailSafeProfibusState(SlaveState):
         if self.need_reparameterization == True:
             if DpTelegram_SetPrm_Req.checkType(telegram):
                 self.need_reparameterization = False
+                print("Received reparameterization telegram")
                 slave.setState(Wait_PrmState())
-                return slave.checkTelegram(telegram)
+                return slave.getState().checkTelegram(slave, telegram)
             else:
                 raise SlaveException("Slave " + str(slave.getId()) + """
                                      is in Fail safe mode and needs reparameterization but

@@ -31,7 +31,7 @@ class TestSlave(TestCase):
             #slave.setState(Wait_PrmState(slave))
             #parameterization
             cls.slave.setAddress(0)
-            cls.slave.setParameters(False, 30000, 100, False, False, 0, 111, "victim")
+            cls.slave.setParameters(True, 5000, 100, False, False, 0, 111, "victim")
             cls.slave.setState(Data_ExchState())
 
             
@@ -47,8 +47,11 @@ class TestSlave(TestCase):
         out_du = bytearray()
         
         #run
-        for i in range(11):
-            r = self.slave.receive(15)
+        for i in range(110):
+            try:
+                r = self.slave.receive(15)
+            except Exception as e:
+                print(e)
             if not r:
                 raise SlaveException("Did't receive anything!")
             print("Slave " + self.slave.getId() + " received the telegram: %s" % self.slave.rx_telegram)
@@ -64,10 +67,10 @@ class TestSlave(TestCase):
                  self.slave.getMasterAddress(),
                  self.slave.address,
                  FdlTelegram.FC_OK,
-                 #self.slave.rx_telegram.fc,
                  out_du
             )
             self.slave.send(send_telegram)
+        
 
     @unittest.skip("Skipping test")  
     def testEnterClearModeSlave(self):

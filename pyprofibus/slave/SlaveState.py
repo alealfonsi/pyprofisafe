@@ -15,8 +15,7 @@ class SlaveState(ABC):
 			print("RX error: %s" % str(e))
 			return False
 		if ok and telegram:
-			if ((telegram.sa == slave.getMasterAddress()) and 
-			((telegram.da == self.getAddress(slave)) or (telegram.da == FdlTelegram.ADDRESS_MCAST))):
+			if (telegram.da == self.getAddress(slave)) or (telegram.da == FdlTelegram.ADDRESS_MCAST):
 				if self.checkTelegram(slave, telegram):
 					slave.resetWatchdog()
 					print("""XXX| Slave %s in state %s received frame of type %s at time: %d\n

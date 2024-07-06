@@ -62,7 +62,8 @@ class Wait_PrmState(SlaveState):
     
     def checkTelegramToSend(self, slave, telegram):
         if not FdlTelegram_ack.checkType(telegram):
-            raise SlaveException()
+            raise SlaveException("""Trying to send telegram of
+                                 class %s instead of ack.""" % telegram.__class__)
         return True
     
     

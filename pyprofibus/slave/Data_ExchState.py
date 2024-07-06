@@ -14,6 +14,9 @@ class Data_ExchState(SlaveState):
         return cls._self
 
     def checkTelegram(self, slave, telegram):
+        if not telegram.sa == slave.getMasterAddress():
+            print("Not my master")
+            return False
         if (
              DpTelegram_DataExchange_Req.checkType(telegram) or
              DpTelegram_GlobalControl.checkType(telegram)
