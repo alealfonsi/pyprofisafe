@@ -26,7 +26,6 @@ class FailSafeProfibusState(SlaveState):
         slave.phy.discard()
         if self.need_reparameterization:
             self.__sendRequestDiagnosticTelegram(slave)
-
     
     def checkTelegram(self, slave, telegram):
         if self.need_reparameterization == True:
