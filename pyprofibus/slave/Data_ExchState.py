@@ -50,17 +50,7 @@ class Data_ExchState(SlaveState):
              raise SlaveException("Slave " + str(slave.getId()) + """ is in 
                                       Data Exchange state. Cannot send this kind of telegram\n
                                       Telegram: %s""" % str(telegram))
-        
-    #def __handleDataExchangeRequest(self, telegram):
-    #    # Here the handling of the meaning of the telegram has to be done
-    #    # At the moment, this method is implemented just answering to the master with a standard frame
-    #    # of the proper type
-    #    response_telegram = DpTelegram_DataExchange_Con(da = self.getSlave().getMasterAddress(),
-    #                                                    sa = self.getAddress(),
-    #                                                    fc = FdlTelegram.FC_DL,
-    #                                                    du = b"\x00\x00\x00\x00")
-    #    #TO-DO send the telegram
-        
+                
         
     def setParameters(self, slave, wd_on, watchdog, slave_reaction_time, freeze_mode_enable, locked, group, master_add, id):
         raise SlaveException("Slave " + str(slave.getId()) + " is in Data Exchange state, can't accept parameterization!")
