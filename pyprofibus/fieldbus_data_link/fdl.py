@@ -354,7 +354,7 @@ class FdlTelegram():
 					raise FdlError("Invalid FDL packet length")
 				if data[5] != FdlTelegram.ED:
 					raise FdlError("Invalid end delimiter")
-				if data[4] != FdlTelegram.calcFCS(data[1:4]):
+				if data[4] != FdlTelegram.calcFCS(data[1:5]):
 					raise FdlError("Checksum mismatch")
 				return FdlTelegram_stat0(
 					da=data[1], sa=data[2], fc=data[3])

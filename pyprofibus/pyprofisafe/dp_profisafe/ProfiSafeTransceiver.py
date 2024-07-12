@@ -17,10 +17,11 @@ class ProfiSafeTransceiver():
         telegram = None
         ok, payload = self.dp_trans.poll(timeout)
         if ok and payload:
-            safety_wrapper = self.dp_trans.fdlTrans.phy.getSerial().read(5)
-            if len(safety_wrapper) == 5:
+            safety_wrapper = self.dp_trans.fdlTrans.phy.getSerial().read(4)
+            if len(safety_wrapper) == 4:
                 control_byte = safety_wrapper[0]
                 crc = safety_wrapper[1:4]
+                self.checkCRC(crc)
                 if DpTelegram_GlobalControl.checkType(payload):
                     telegram = ProfiSafeTelegram_GlobalControl(payload, control_byte, crc)
                 else:
@@ -34,7 +35,6 @@ class ProfiSafeTransceiver():
         return (ok, telegram)
 
 
-
     def send(self, telegram):
         if ProfiSafeTelegram.checkType(telegram):
             self.dp_trans.send(False, telegram.payload)
@@ -42,3 +42,8 @@ class ProfiSafeTransceiver():
             self.dp_trans.fdlTrans.phy.sendData(telegram.crc, None)
         else:        
             self.dp_trans.send(False, telegram)
+    
+    def checkCRC(self, crc):
+        for b in crc:
+            if b != '\xab':
+                raise ProfiSafeError("CRC Error!")

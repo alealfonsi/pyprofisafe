@@ -21,11 +21,11 @@ class FailSafeProfibusState(SlaveState):
         print("Slave " + slave.getId() + " is entering fail safe state (Profibus)")
     
     def enterFailSafeState(self, slave):
-        self.__setFailSafeProcessVariables()
-        self.__clearOutputs()
+        self._setFailSafeProcessVariables()
+        self._clearOutputs()
         slave.phy.discard()
         if self.need_reparameterization:
-            self.__sendRequestDiagnosticTelegram(slave)
+            self._sendRequestDiagnosticTelegram(slave)
     
     def checkTelegram(self, slave, telegram):
         if self.need_reparameterization == True:
@@ -61,9 +61,6 @@ class FailSafeProfibusState(SlaveState):
             slave.setState(Data_ExchState())
             slave.setRxTelegram(telegram)
             return True
-        elif DpTelegram_SetPrm_Req.checkType(telegram):
-                slave.setState(Wait_PrmState())
-                return slave.getState().checkTelegram(slave, telegram)
         else:
              raise SlaveException("Slave " + str(slave.getId()) + """ is in 
                                       Fail safe mode and received a proper telegram at the fdl level 
@@ -79,10 +76,10 @@ class FailSafeProfibusState(SlaveState):
     
     def checkTelegramToSend(self, slave, telegram):
         if not DpTelegram_DataExchange_Con.checkType(telegram):
-            raise SlaveException()
+            raise SlaveException("")
         return True
 
-    def __sendRequestDiagnosticTelegram(self, slave):
+    def _sendRequestDiagnosticTelegram(self, slave):
         send_telegram = DpTelegram_DataExchange_Con(da=slave.getMasterAddress(),
                                                     sa=slave.address,
                                                     fc=FdlTelegram.FC_RDH,
@@ -97,8 +94,8 @@ class FailSafeProfibusState(SlaveState):
         raise SlaveException("""ERROR: method setParameters called on slave %d 
                              that is in Fail Safe state!""" % slave.getId())
             
-    def __clearOutputs(self):
-        """TO-DO"""
+    def _clearOutputs(self):
+        """TODO"""
 
-    def __setFailSafeProcessVariables(self):
-        """TO-DO"""
+    def _setFailSafeProcessVariables(self):
+        """TODO"""
