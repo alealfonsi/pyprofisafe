@@ -14,6 +14,7 @@ from pyprofibus.compat import *
 from pyprofibus.gsd.interp import GsdInterp
 from pyprofibus.gsd.parser import GsdError
 from pyprofibus.master.SimpleMaster import SimpleMaster
+from pyprofibus.pyprofisafe.master_profisafe.F_Host import F_Host
 from pyprofibus.util import *
 
 import re
@@ -309,6 +310,25 @@ class PbConf(object):
 		from pyprofibus.master.dp_master import DPM1, DPM2
 		if self.dpMasterClass == 1:
 			DpMasterClass = SimpleMaster
+		elif self.dpMasterClass == 2:
+			DpMasterClass = DPM2
+		else:
+			raise PbConfError("Invalid dpMasterClass parameter value: "
+					  "%d" % self.dpMasterClass)
+		master = DpMasterClass(dpmClass=1, phy=phy,
+				       masterAddr=self.dpMasterAddr,
+				       debug=(self.debug >= 1))
+		return master
+	
+	def makeProfiSafeDPM(self, phy=None):
+		if phy is None:
+			# Create a PHY (layer 1) interface object.
+			phy = self.makePhy()
+
+		# Create a DP class 1 or 2 master.
+		from pyprofibus.master.dp_master import DPM1, DPM2
+		if self.dpMasterClass == 1:
+			DpMasterClass = F_Host
 		elif self.dpMasterClass == 2:
 			DpMasterClass = DPM2
 		else:
