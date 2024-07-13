@@ -1,4 +1,4 @@
-from pyprofibus.pyprofisafe.dp_profisafe import ProfiSafeTransceiver
+from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTransceiver import ProfiSafeTransceiver
 from pyprofibus.pyprofisafe.slave_profisafe.FailSafeProfiSafeState import FailSafeProfiSafeState
 from pyprofibus.slave.Slave import Slave
 from pyprofibus.slave.SlaveException import WatchdogExpiredException
@@ -16,7 +16,6 @@ class F_Device(Slave):
     def watchdogExpired(self):
         self.f_monitor_expired = True
         self.setState(FailSafeProfiSafeState(self))
-        self.getState().enterPassivation(self)
         self.watchdog = None
         raise WatchdogExpiredException("Slave " + self.id + ": F-Monitoring time expired!")
 

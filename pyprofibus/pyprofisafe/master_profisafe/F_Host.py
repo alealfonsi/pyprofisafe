@@ -3,7 +3,8 @@ from pyprofibus.dp.dp import DpError, DpTelegram_DataExchange_Con, DpTelegram_Da
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram, FdlTelegram_ack
 from pyprofibus.master.SimpleMaster import SimpleMaster
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
-from pyprofibus.pyprofisafe.dp_profisafe import ControlByteHost, ProfiSafeTransceiver
+from pyprofibus.pyprofisafe.dp_profisafe.ControlByteHost import ControlByteHost
+from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTransceiver import ProfiSafeTransceiver
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_GlobalControl import ProfiSafeTelegram_GlobalControl
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_Req import ProfiSafeTelegram_Req
 from pyprofibus.util import ProfibusError, monotonic_time

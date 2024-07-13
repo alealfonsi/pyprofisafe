@@ -1,4 +1,6 @@
 import sys
+sys.path.insert(0, "/home/alessio/pyprofisafe")
+
 import time
 
 import pyprofibus
@@ -13,12 +15,11 @@ from pyprofibus.pyprofisafe.slave_profisafe.SafetyData_ExchState import SafetyDa
 from pyprofibus.pyprofisafe.slave_profisafe.SafetyResetState import SafetyResetState
 from pyprofibus.slave.SlaveException import SlaveException
 from pyprofibus.util import ProfibusError
-sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 from unittest import TestCase
 import unittest
 
-class TestSlave(TestCase):
+class TestSlaveProfisafe(TestCase):
 
     phy: CpPhySerial
     slave: F_Device
@@ -33,7 +34,7 @@ class TestSlave(TestCase):
             #slave.setState(Wait_PrmState(slave))
             #parameterization
             cls.slave.setAddress(0)
-            cls.slave.setParameters(True, 5000, 100, False, False, 0, 111, "victim")
+            cls.slave.setParameters(True, 50000, 100, False, False, 0, 111, "victim")
             cls.slave.setState(SafetyData_ExchState())
 
             
@@ -50,10 +51,11 @@ class TestSlave(TestCase):
         
         #run
         for i in range(4):
-            try:
-                r = self.slave.receive(15)
-            except Exception as e:
-                print(e)
+            #try:
+            #    r = self.slave.receive(15)
+            #except Exception as e:
+            #    print(e)
+            r = self.slave.receive(150)
             if not r:
                 raise SlaveException("Did't receive anything!")
             print("Slave " + self.slave.getId() + " received the telegram: %s" % self.slave.rx_telegram)
