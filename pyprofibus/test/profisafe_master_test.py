@@ -1,11 +1,11 @@
 import sys
+sys.path.insert(0, "/home/alessio/pyprofisafe")
 import time
 
 import pyprofibus
 from pyprofibus.dp.dp import DpTelegram_SetPrm_Req
 from pyprofibus.physical.phy_serial import CpPhySerial
 from pyprofibus.pyprofisafe.master_profisafe.F_Host import F_Host
-sys.path.insert(0, "/home/alessio/pyprofisafe")
 
 from unittest import TestCase
 import unittest
@@ -60,7 +60,7 @@ class TestMasterProfisafe(TestCase):
     
     #@unittest.skip("Skipping cyclic communication test")
     def testCyclicCommunicationMaster(self):
-        
+        c = 0
         while True:
                 # Write the output data.
                 for slaveDesc in self.master.getSlaveList():

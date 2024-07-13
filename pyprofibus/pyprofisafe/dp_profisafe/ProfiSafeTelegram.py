@@ -17,9 +17,8 @@ class ProfiSafeTelegram(ABC):
     def __init__(self, crc):
         self.crc = crc
     
-    def checkType(self, telegram):
-        if isinstance(telegram, self.__class__):
-            return True
-        return False
+    @classmethod
+    def checkType(cls, telegram):
+        return isinstance(telegram, cls)
     
 

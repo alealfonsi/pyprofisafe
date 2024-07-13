@@ -20,3 +20,4 @@ class ProfiSafeTelegram_Con(ProfiSafeTelegram):
                 raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
         else:
             raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, control_byte.__class__))
+        

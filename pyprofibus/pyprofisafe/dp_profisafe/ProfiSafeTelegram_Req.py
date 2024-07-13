@@ -7,7 +7,7 @@ from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 class ProfiSafeTelegram_Req(ProfiSafeTelegram):
     
     def __init__(self, payload, control_byte, crc):
-        super(crc)
+        super().__init__(crc)
         if isinstance(control_byte, ControlByteHost):
             self.control_byte = control_byte
             if (
@@ -22,3 +22,4 @@ class ProfiSafeTelegram_Req(ProfiSafeTelegram):
                 raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
         else:
             raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
+        

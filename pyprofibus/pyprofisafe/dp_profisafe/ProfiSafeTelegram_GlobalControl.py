@@ -11,3 +11,4 @@ class ProfiSafeTelegram_GlobalControl(ProfiSafeTelegram):
             self.payload = payload
         else:
             raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
+    

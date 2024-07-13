@@ -1,4 +1,5 @@
 from pyprofibus.dp.dp import DpTelegram_GlobalControl, DpTransceiver
+from pyprofibus.fieldbus_data_link.fdl import FdlFCB
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram import ProfiSafeTelegram
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_Con import ProfiSafeTelegram_Con
@@ -36,8 +37,10 @@ class ProfiSafeTransceiver():
 
 
     def send(self, telegram):
-        if ProfiSafeTelegram.checkType(telegram):
-            self.dp_trans.send(False, telegram.payload)
+        if (ProfiSafeTelegram_Req.checkType(telegram)
+            or ProfiSafeTelegram_Con.checkType(telegram)
+            or ProfiSafeTelegram_GlobalControl.checkType(telegram)):
+            self.dp_trans.send(FdlFCB(False), telegram.payload)
             self.dp_trans.fdlTrans.phy.sendData(telegram.control_byte.data, None)
             self.dp_trans.fdlTrans.phy.sendData(telegram.crc, None)
         else:        

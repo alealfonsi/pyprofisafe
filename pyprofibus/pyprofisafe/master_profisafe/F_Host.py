@@ -25,7 +25,7 @@ class F_Host(SimpleMaster):
             transceiver = self.ps_trans
             print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
                     % (telegram.__class__, time.time(), telegram))
-            transceiver.send(telegram=telegram)
+            transceiver.send(telegram)
         except (ProfibusError, ProfiSafeError) as e:
             slave.pendingReq = None
             self._debugMsg(str(e))
