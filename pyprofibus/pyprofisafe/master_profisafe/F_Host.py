@@ -110,7 +110,7 @@ class F_Host(SimpleMaster):
                             du=toSlaveData)
                         control_byte = ControlByteHost(
                             ControlByteHost.TOGGLE_H + ControlByteHost.LOOPBACK)
-                        crc = b'\xab' * 24
+                        crc = b'\xab' * 3
                         ok = self._send(slave,
                                      telegram=ProfiSafeTelegram_Req(payload, control_byte, crc),
                                      timeout=10)
@@ -161,7 +161,7 @@ class F_Host(SimpleMaster):
             ControlByteHost(ControlByteHost.OPERATOR_ACK_REQUESTED +
                             ControlByteHost.ACTIVATE_FV +
                             ControlByteHost.LOOPBACK),
-            b'\xab' * 24)
+            b'\xab' * 3)
         print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
 		 			% (globCtl.__class__, time.time(), globCtl))
         self.ps_trans.send(telegram = globCtl)
@@ -241,7 +241,7 @@ class F_Host(SimpleMaster):
                         control_byte = ControlByteHost(ControlByteHost.OPERATOR_ACK_REQUESTED +
                             ControlByteHost.ACTIVATE_FV +
                             ControlByteHost.LOOPBACK)
-                        crc = b'\xab' * 24
+                        crc = b'\xab' * 3
                         ok = self._send(slave,
                                          telegram=ProfiSafeTelegram_Req(payload, control_byte, crc),
                                          timeout=10)
@@ -277,7 +277,7 @@ class F_Host(SimpleMaster):
             ControlByteHost.OPERATOR_ACK +
             ControlByteHost.LOOPBACK
         )
-        crc = b'\xab' * 24
+        crc = b'\xab' * 3
         globCtl = ProfiSafeTelegram_GlobalControl(payload, control_byte, crc)
         print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
 		 			% (globCtl.__class__, time.time(), globCtl))

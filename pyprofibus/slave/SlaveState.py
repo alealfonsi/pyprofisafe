@@ -27,10 +27,10 @@ class SlaveState(ABC):
 		  			% (slave.getId(), self.__class__, time.time(), telegram))
 			return False
 		
-	def send(self, slave, telegram, dpTrans):
+	def send(self, slave, telegram):
 		try:
 			self.checkTelegramToSend(slave, telegram)
-			dpTrans.send(FdlFCB(False), telegram) 
+			slave.dpTrans.send(FdlFCB(False), telegram) 
 			#fcb is passed as disabled
 			#this feature is not really part of Profibus DP, but of the 
 			#standard Profibus. It will be useful with profisafe because

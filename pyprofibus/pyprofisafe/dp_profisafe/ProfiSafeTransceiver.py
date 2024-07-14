@@ -16,6 +16,7 @@ class ProfiSafeTransceiver():
 
     def poll(self, timeout = 0.0):
         telegram = None
+        #safety_wrapper = self.dp_trans.fdlTrans.phy.getSerial().read(40)
         ok, payload = self.dp_trans.poll(timeout)
         if ok and payload:
             safety_wrapper = self.dp_trans.fdlTrans.phy.getSerial().read(4)
@@ -48,5 +49,5 @@ class ProfiSafeTransceiver():
     
     def checkCRC(self, crc):
         for b in crc:
-            if b != '\xab':
+            if b != 0xab:
                 raise ProfiSafeError("CRC Error!")

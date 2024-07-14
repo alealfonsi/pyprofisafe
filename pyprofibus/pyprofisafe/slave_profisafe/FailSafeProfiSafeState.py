@@ -1,3 +1,4 @@
+import time
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con, DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
@@ -61,6 +62,38 @@ class FailSafeProfiSafeState(FailSafeProfibusState):
                                                     du=bytearray((0x00, 0x00)))
         control_byte = ControlByteDevice(0x00)
         #create a proper crc here
-        crc = b'\xab' * 24
+        crc = b'\xab' * 3
         telegram = ProfiSafeTelegram_Con(payload, control_byte, crc)
         slave.ps_trans.send(telegram)
+    
+    #override
+    def receive(self, slave, timeout):
+        try:
+            ok, telegram = slave.ps_trans.poll(timeout)
+        except ProfiSafeError as e:
+            print("RX error: %s" % str(e))
+            return False
+        if ok and telegram:
+            if (telegram.payload.da == self.getAddress(slave)) or (telegram.payload.da == FdlTelegram.ADDRESS_MCAST):
+                if self.checkTelegram(slave, telegram):
+                    slave.resetWatchdog()
+                    print("""XXX| Slave %s in state %s received frame of type %s at time: %d\n
+                      XXX| %s""" % (slave.getId(), self.__class__, telegram.__class__, time.time(), telegram))
+                    return True
+        else:
+            if telegram:
+                print("XXX| Slave %s in state %s received corrupt telegram at time: %d\nXXX| %s" 
+          			% (slave.getId(), self.__class__, time.time(), telegram))
+            return False
+    
+    #override
+    def send(self, slave, telegram):
+        try:
+            self.checkTelegramToSend(slave, telegram)
+            slave.ps_trans.send(telegram) 
+            #fcb is passed as disabled
+            #this feature is not really part of Profibus DP, but of the 
+            #standard Profibus. It will be useful with profisafe because
+            #its functioning is very similar to the virtual monitoring number
+        except ProfiSafeError as e:
+        	print(str(e))

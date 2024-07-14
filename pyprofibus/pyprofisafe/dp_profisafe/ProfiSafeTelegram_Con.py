@@ -7,17 +7,14 @@ from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 class ProfiSafeTelegram_Con(ProfiSafeTelegram):
 
     def __init__(self, payload, control_byte, crc):
-        super(crc)
-        if isinstance(control_byte, ControlByteDevice):
-            self.control_byte = control_byte
-            if (
-                DpTelegram_DataExchange_Con.checkType(payload)
-                or DpTelegram_SlaveDiag_Con.checkType(payload)
-                or DpTelegram_GetCfg_Con.checkType(payload)
-            ):
-                self.payload = payload
-            else:
-                raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
+        super().__init__(crc)
+        self.control_byte = ControlByteDevice(control_byte)
+        if (
+            DpTelegram_DataExchange_Con.checkType(payload)
+            or DpTelegram_SlaveDiag_Con.checkType(payload)
+            or DpTelegram_GetCfg_Con.checkType(payload)
+        ):
+            self.payload = payload
         else:
-            raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, control_byte.__class__))
+            raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
         

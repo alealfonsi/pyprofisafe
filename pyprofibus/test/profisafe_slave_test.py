@@ -74,7 +74,7 @@ class TestSlaveProfisafe(TestCase):
                  out_du
             )
             control_byte = ControlByteDevice(ControlByteDevice.TOGGLE_D)
-            crc = b'\xab' * 24
+            crc = b'\xab' * 3
             send_telegram = ProfiSafeTelegram_Con(payload, control_byte, crc)
             self.slave.send(send_telegram)
     

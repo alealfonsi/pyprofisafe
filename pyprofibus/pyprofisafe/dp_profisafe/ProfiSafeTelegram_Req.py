@@ -8,18 +8,15 @@ class ProfiSafeTelegram_Req(ProfiSafeTelegram):
     
     def __init__(self, payload, control_byte, crc):
         super().__init__(crc)
-        if isinstance(control_byte, ControlByteHost):
-            self.control_byte = control_byte
-            if (
-                DpTelegram_DataExchange_Req.checkType(payload)
-                or DpTelegram_SlaveDiag_Req.checkType(payload)
-                or DpTelegram_SetPrm_Req.checkType(payload)
-                or DpTelegram_ChkCfg_Req.checkType(payload)
-                or DpTelegram_GetCfg_Req.checkType(payload)
-            ):
-                self.payload = payload
-            else:
-                raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
+        self.control_byte = ControlByteHost(control_byte)
+        if (
+            DpTelegram_DataExchange_Req.checkType(payload)
+            or DpTelegram_SlaveDiag_Req.checkType(payload)
+            or DpTelegram_SetPrm_Req.checkType(payload)
+            or DpTelegram_ChkCfg_Req.checkType(payload)
+            or DpTelegram_GetCfg_Req.checkType(payload)
+        ):
+            self.payload = payload
         else:
             raise ProfiSafeError("Cannot instantiate %s with a %s !" % (self.__class__, payload.__class__))
         
