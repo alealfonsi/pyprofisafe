@@ -42,8 +42,11 @@ class ProfiSafeTransceiver():
             or ProfiSafeTelegram_Con.checkType(telegram)
             or ProfiSafeTelegram_GlobalControl.checkType(telegram)):
             self.dp_trans.send(FdlFCB(False), telegram.payload)
-            self.dp_trans.fdlTrans.phy.sendData(telegram.control_byte.data, None)
-            self.dp_trans.fdlTrans.phy.sendData(telegram.crc, None)
+            safety_wrapper = bytearray()
+            safety_wrapper.append(int(telegram.control_byte.data))
+            for i in range(3):
+                safety_wrapper.append(int(telegram.crc[i]))
+            self.dp_trans.fdlTrans.phy.sendData(safety_wrapper, None)         
         else:        
             self.dp_trans.send(False, telegram)
     
