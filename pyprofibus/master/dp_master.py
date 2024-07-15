@@ -317,7 +317,7 @@ class DpMaster(DpMasterInterface):
 		"__runNextSlaveIndex",
 		"__slaveDescs",
 		"__slaveDescsList",
-		"__slaveStates",
+		"_slaveStates",
 		"__slowDown",
 		"__slowDownFact",
 		"__slowDownUntil",
@@ -349,7 +349,7 @@ class DpMaster(DpMasterInterface):
 		self.__slaveDescs = {
 			FdlTelegram.ADDRESS_MCAST : mcastSlaveDesc,
 		}
-		self.__slaveStates = {
+		self._slaveStates = {
 			FdlTelegram.ADDRESS_MCAST : mcastSlave,
 		}
 		self.__slaveDescsList = []
@@ -392,11 +392,11 @@ class DpMaster(DpMasterInterface):
 
 		slaveAddr = slaveDesc.slaveAddr
 		if slaveAddr in self.__slaveDescs or\
-		   slaveAddr in self.__slaveStates:
+		   slaveAddr in self._slaveStates:
 			raise DpError("Slave %d is already registered." % slaveAddr)
 		slaveDesc.dpm = self
 		self.__slaveDescs[slaveAddr] = slaveDesc
-		self.__slaveStates[slaveAddr] = DpSlaveState(self, slaveDesc)
+		self._slaveStates[slaveAddr] = DpSlaveState(self, slaveDesc)
 
 		# Rebuild the slave desc list.
 		self.__slaveDescsList = [
@@ -778,14 +778,14 @@ class DpMaster(DpMasterInterface):
 			if FdlTelegram_token.checkType(telegram):
 				pass#TODO handle token
 			elif FdlTelegram_ack.checkType(telegram):
-				for addr, slave in self.__slaveStates.items():
+				for addr, slave in self._slaveStates.items():
 					if addr != FdlTelegram.ADDRESS_MCAST:
 						slave.shortAckReceived = True
 			elif telegram.da == FdlTelegram.ADDRESS_MCAST:
 				self.__handleMcastTelegram(telegram)
 			elif telegram.da == self.masterAddr:
-				if telegram.sa in self.__slaveStates:
-					slave = self.__slaveStates[telegram.sa]
+				if telegram.sa in self._slaveStates:
+					slave = self._slaveStates[telegram.sa]
 					slave.rxQueue.append(telegram)
 					slave.fcb.handleReply()
 				else:
@@ -834,7 +834,7 @@ class DpMaster(DpMasterInterface):
 		slaveDesc = slaveDescsList[runNextSlaveIndex]
 		self.__runNextSlaveIndex = (runNextSlaveIndex + 1) % len(slaveDescsList)
 
-		slave = self.__slaveStates[slaveDesc.slaveAddr]
+		slave = self._slaveStates[slaveDesc.slaveAddr]
 		fromSlaveData = self._runSlave(slave)
 		if (fromSlaveData is not None and
 		    len(fromSlaveData) != slaveDesc.outputSize):
@@ -860,25 +860,25 @@ class DpMaster(DpMasterInterface):
 				      slaveDesc.slaveAddr,
 				      len(data),
 				      slaveDesc.inputSize))
-		slave = self.__slaveStates[slaveDesc.slaveAddr]
+		slave = self._slaveStates[slaveDesc.slaveAddr]
 		slave.toSlaveData = data
 
 	def _getFromSlaveData(self, slaveDesc):
 		"""Get the latest received master-in-data.
 		Returns None, if there was no received data.
 		"""
-		slave = self.__slaveStates[slaveDesc.slaveAddr]
+		slave = self._slaveStates[slaveDesc.slaveAddr]
 		fromSlaveData = slave.fromSlaveData
 		slave.fromSlaveData = None
 		return fromSlaveData
 
 	def _slaveIsConnecting(self, slaveDesc):
-		slave = self.__slaveStates[slaveDesc.slaveAddr]
+		slave = self._slaveStates[slaveDesc.slaveAddr]
 		return (not slave.dxCycleRunning and
 		        slave.getState() != DpSlaveState.STATE_INIT)
 
 	def _slaveIsConnected(self, slaveDesc):
-		slave = self.__slaveStates[slaveDesc.slaveAddr]
+		slave = self._slaveStates[slaveDesc.slaveAddr]
 		return slave.dxCycleRunning
 
 	def initialize(self):
@@ -891,7 +891,7 @@ class DpMaster(DpMasterInterface):
 		gc.collect()
 
 	def __syncFreezeHelper(self, groupMask, controlCommand):
-		slave = self.__slaveStates[FdlTelegram.ADDRESS_MCAST]
+		slave = self._slaveStates[FdlTelegram.ADDRESS_MCAST]
 		globCtl = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
 						   sa = self.masterAddr)
 		globCtl.controlCommand |= controlCommand

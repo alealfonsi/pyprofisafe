@@ -16,6 +16,7 @@ class F_Host(SimpleMaster):
     def __init__(self, dpmClass, phy, masterAddr, debug=False):
         super().__init__(dpmClass, phy, masterAddr, debug)
         self.ps_trans = ProfiSafeTransceiver(self.dpTrans)
+        self._slaveStates = super().getSlaveStates()
     
     def _send(self, slave, telegram, timeout):
         """Asynchronously send a telegram to a slave.
@@ -74,7 +75,7 @@ class F_Host(SimpleMaster):
                     elif resFunc == FdlTelegram.FC_RS:
                         raise DpError("Service not active "
                                        "on slave %d" % slave.slaveDesc.slaveAddr)
-                    dataExInData = telegram.getDU()
+                    dataExInData = telegram.payload.getDU()
             if (dataExInData is not None or
                     (slaveOutputSize == 0 and slave.shortAckReceived)):
                 # We received some data or an ACK (input-only slave).
@@ -134,8 +135,8 @@ class F_Host(SimpleMaster):
             print("XXX| Master received frame of type %s at time: %d\nXXX| %s" 
                   % (telegram.__class__, time.time(), telegram))
             if telegram.payload.da == self.masterAddr:
-                if telegram.payload.sa in self.__slaveStates:
-                    slave = self.__slaveStates[telegram.payload.sa]
+                if telegram.payload.sa in self._slaveStates:
+                    slave = self._slaveStates[telegram.payload.sa]
                     slave.rxQueue.append(telegram)
                     slave.fcb.handleReply()
                 else:
@@ -151,7 +152,7 @@ class F_Host(SimpleMaster):
                               "telegram at time: %d\nXXX| %s" % (time.time(), telegram))
 
     def goToClearMode(self):
-        slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
+        slave = self._slaveStates[FdlTelegram.ADDRESS_MCAST]
         payload = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
         				   sa = self.masterAddr)
         payload.controlCommand |= DpTelegram_GlobalControl.CCMD_CLEAR
@@ -167,7 +168,7 @@ class F_Host(SimpleMaster):
         self.ps_trans.send(telegram = globCtl)
         
         for s in self._DpMaster__slaveDescsList:
-            slave_state = self._DpMaster__slaveStates[s.slaveAddr]
+            slave_state = self._slaveStates[s.slaveAddr]
             if slave_state.getState() == slave_state.STATE_DX:
                 slave_state.setState(slave_state.STATE_INVALID, -1)
         
@@ -269,7 +270,7 @@ class F_Host(SimpleMaster):
         slave.applyState()
     
     def exitClearMode(self):
-        slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
+        slave = self._slaveStates[FdlTelegram.ADDRESS_MCAST]
         payload = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
         				   sa = self.masterAddr)
         payload.controlCommand |= DpTelegram_GlobalControl.CCMD_OPERATE
@@ -285,7 +286,7 @@ class F_Host(SimpleMaster):
         self.ps_trans.send(telegram = globCtl)
         
         for s in self._DpMaster__slaveDescsList:
-            slave_state = self._DpMaster__slaveStates[s.slaveAddr]
+            slave_state = self._slaveStates[s.slaveAddr]
             if slave_state.getState() == slave_state.STATE_DX:
                 continue
             if slave_state.getState() != slave_state.STATE_INVALID:

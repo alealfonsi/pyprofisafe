@@ -37,7 +37,7 @@ class SimpleMaster(DpMaster):
     
     def addSlave(self, slaveDesc, time_limit):
         super().addSlave(slaveDesc)
-        slave = self._DpMaster__slaveStates[slaveDesc.slaveAddr]
+        slave = self._slaveStates[slaveDesc.slaveAddr]
         slave.setState(slave.STATE_DX, time_limit)
         slave.applyState()
         
@@ -140,7 +140,7 @@ class SimpleMaster(DpMaster):
         return dataExInData
     
     def goToClearMode(self):
-        slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
+        slave = self._slaveStates[FdlTelegram.ADDRESS_MCAST]
         globCtl = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
         				   sa = self.masterAddr)
         globCtl.controlCommand |= DpTelegram_GlobalControl.CCMD_CLEAR
@@ -151,7 +151,7 @@ class SimpleMaster(DpMaster):
         		  telegram = globCtl)
         
         for s in self._DpMaster__slaveDescsList:
-            slave_state = self._DpMaster__slaveStates[s.slaveAddr]
+            slave_state = self._slaveStates[s.slaveAddr]
             if slave_state.getState() == slave_state.STATE_DX:
                 slave_state.setState(slave_state.STATE_INVALID, -1)
         
@@ -299,7 +299,7 @@ class SimpleMaster(DpMaster):
     # A global telegram is sent to communicate to all the slaves
     # that the master is back to Operational Mode. 
     def exitClearMode(self):
-        slave = self._DpMaster__slaveStates[FdlTelegram.ADDRESS_MCAST]
+        slave = self._slaveStates[FdlTelegram.ADDRESS_MCAST]
         globCtl = DpTelegram_GlobalControl(da = FdlTelegram.ADDRESS_MCAST,
         				   sa = self.masterAddr)
         globCtl.controlCommand |= DpTelegram_GlobalControl.CCMD_OPERATE
@@ -314,7 +314,7 @@ class SimpleMaster(DpMaster):
         #self._pollRx()
         
         for s in self._DpMaster__slaveDescsList:
-            slave_state = self._DpMaster__slaveStates[s.slaveAddr]
+            slave_state = self._slaveStates[s.slaveAddr]
             if slave_state.getState() == slave_state.STATE_DX:
                 continue
             if slave_state.getState() != slave_state.STATE_INVALID:
@@ -347,3 +347,6 @@ class SimpleMaster(DpMaster):
         slave.applyState()
 
         return dataExInData
+
+    def getSlaveStates(self):
+        return self._slaveStates
