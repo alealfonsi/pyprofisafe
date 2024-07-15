@@ -210,7 +210,8 @@ class PbConf(object):
 					raise ValueError("Invalid group_mask")
 				s.watchdogMs = getint(section, "watchdog_ms",
 						      fallback=5000)
-				if s.watchdogMs < 0 or s.watchdogMs > 255 * 255:
+				#if s.watchdogMs < 0 or s.watchdogMs > 255 * 255:
+				if s.watchdogMs < 0 or s.watchdogMs > 255 * 255 * 100:
 					raise ValueError("Invalid watchdog_ms")
 				s.inputSize = getint(section, "input_size")
 				if s.inputSize < 0 or s.inputSize > 246:

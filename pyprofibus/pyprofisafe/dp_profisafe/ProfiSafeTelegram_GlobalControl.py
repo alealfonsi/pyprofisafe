@@ -8,7 +8,7 @@ class ProfiSafeTelegram_GlobalControl(ProfiSafeTelegram):
 
     def __init__(self, payload, control_byte, crc):
         super().__init__(crc)
-        self.control_byte = ControlByteHost(control_byte)
+        self.control_byte = control_byte
         if DpTelegram_GlobalControl.checkType(payload):
             self.payload = payload
         else:

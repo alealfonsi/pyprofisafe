@@ -262,12 +262,12 @@ class DpSlaveDesc(DpSlaveDescInterface):
 		# Set timeout factors
 		fact1 = timeoutMS / 10
 		fact2 = 1
-		while fact1 > 255:
-			fact2 *= 2
-			fact1 /= 2
-			if fact2 > 255:
-				raise DpError("Watchdog timeout %d is too big" % timeoutMS)
-		fact1 = min(255, int(math.ceil(fact1)))
+		#while fact1 > 255:
+		#	fact2 *= 2
+		#	fact1 /= 2
+		#	if fact2 > 255:
+		#		raise DpError("Watchdog timeout %d is too big" % timeoutMS)
+		#fact1 = min(255, int(math.ceil(fact1)))
 		self.setPrmTelegram.wdFact1 = fact1
 		self.setPrmTelegram.wdFact2 = fact2
 

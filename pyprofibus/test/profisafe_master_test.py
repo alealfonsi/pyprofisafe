@@ -60,24 +60,23 @@ class TestMasterProfisafe(TestCase):
     
     #@unittest.skip("Skipping cyclic communication test")
     def testCyclicCommunicationMaster(self):
+
         c = 0
         while True:
-                # Write the output data.
-                for slaveDesc in self.master.getSlaveList():
-                    slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
-
-                # Run slave state machines.
-                handledSlaveDesc = self.master.run()
-                time.sleep(0.2)
-
-                # Get the in-data (receive)
-                if handledSlaveDesc:
-                    inData = handledSlaveDesc.getMasterInData()
-                    if inData is not None:
-                        if inData[0] == 7 and inData[1] == 7:
-                             break
-                        self.outData[handledSlaveDesc.name][0] = inData[0] + 1
-                        self.outData[handledSlaveDesc.name][1] = inData[1] + 1
+            # Write the output data.
+            for slaveDesc in self.master.getSlaveList():
+                slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
+            # Run slave state machines.
+            handledSlaveDesc = self.master.run()
+            time.sleep(1)
+            # Get the in-data (receive)
+            if handledSlaveDesc:
+                inData = handledSlaveDesc.getMasterInData()
+                if inData is not None:
+                    if inData[0] == 7 and inData[1] == 7:
+                         break
+                    self.outData[handledSlaveDesc.name][0] = inData[0] + 1
+                    self.outData[handledSlaveDesc.name][1] = inData[1] + 1
 
     @classmethod
     def tearDownClass(cls) -> None:

@@ -8,6 +8,7 @@ from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTransceiver import ProfiSafeTr
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_GlobalControl import ProfiSafeTelegram_GlobalControl
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_Req import ProfiSafeTelegram_Req
 from pyprofibus.util import ProfibusError, monotonic_time
+from inputimeout import inputimeout, TimeoutOccurred
 
 
 class F_Host(SimpleMaster):
@@ -86,10 +87,10 @@ class F_Host(SimpleMaster):
                 if slave.pendingReqTimeout.exceed():
                     self._debugMsg("Data_Exchange timeout with slave %d" % (
                         slave.slaveDesc.slaveAddr))
-                self.have_error_pool.append(slave.slaveDesc.slaveAddr)
-                if self.clear_mode is not True:
-                    self.goToClearMode()
-                slave.pendingReq = None
+                    self.have_error_pool.append(slave.slaveDesc.slaveAddr)
+                    if self.clear_mode is not True:
+                        self.goToClearMode()
+                    slave.pendingReq = None
         else:
             diagPeriod = slave.slaveDesc.diagPeriod
             if diagPeriod > 0 and slave.dxCount >= diagPeriod:
@@ -113,7 +114,7 @@ class F_Host(SimpleMaster):
                         crc = b'\xab' * 3
                         ok = self._send(slave,
                                      telegram=ProfiSafeTelegram_Req(payload, control_byte, crc),
-                                     timeout=10)
+                                     timeout=100)
                         if ok:
                             # We sent it. Reset the data.
                             slave.toSlaveData = None
@@ -247,11 +248,12 @@ class F_Host(SimpleMaster):
                                          timeout=10)
                     else:
                         # broken slave, ask for ack to the operator
+                        ok = False
                         try:
-                            input("Press ENTER to give ack for slave reintegration...", timeout=5)
+                            inputimeout(prompt="Press ENTER to give ack for slave reintegration...", timeout=5)
                             print("Ack received, slave reintegration...")
                             self.slaveReintegration(slave)
-                        except TimeoutError:
+                        except TimeoutOccurred:
                             print("No ack received, continuing cyclic communication")
                     if ok:
                         # We sent it. Reset the data.
