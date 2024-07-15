@@ -1,3 +1,4 @@
+import time
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 from pyprofibus.pyprofisafe.dp_profisafe.ControlByteHost import ControlByteHost
@@ -16,7 +17,7 @@ class SafetyData_ExchState(Data_ExchState):
              DpTelegram_DataExchange_Req.checkType(telegram.payload) or
              DpTelegram_GlobalControl.checkType(telegram.payload)
             ):
-            if telegram.control_byte.isClear():
+            if telegram.control_byte.isClear(2): #2 given just for debug
                 slave.setRxTelegram(telegram)
                 return True
             else:

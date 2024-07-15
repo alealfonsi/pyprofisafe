@@ -34,7 +34,7 @@ class TestSlaveProfisafe(TestCase):
             #slave.setState(Wait_PrmState(slave))
             #parameterization
             cls.slave.setAddress(0)
-            cls.slave.setParameters(True, 50000, 100, False, False, 0, 111, "victim")
+            cls.slave.setParameters(True, 500000, 100, False, False, 0, 111, "victim")
             cls.slave.setState(SafetyData_ExchState())
 
             
@@ -60,7 +60,7 @@ class TestSlaveProfisafe(TestCase):
                 raise SlaveException("Did't receive anything!")
             print("Slave " + self.slave.getId() + " received the telegram: %s" % self.slave.rx_telegram)
             #answer the master sending back the same data incremented by 1
-            in_du = self.slave.rx_telegram.getDU()
+            in_du = self.slave.rx_telegram.payload.getDU()
             if i == 0:
                 out_du.append(in_du[0] + 1)
                 out_du.append(in_du[1] + 1)
