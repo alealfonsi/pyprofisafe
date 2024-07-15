@@ -49,14 +49,13 @@ class Slave(SlaveInterface):
         received = False
         #timeout = time(seconds) waiting in receiving state, polling countinously
         while timeout > 0:
-            time.sleep(0.4)
-            if self.__state.receive(self, 0.01): #check the watchdog every 10ms
+            if self.__state.receive(self, 1): #check the watchdog every 10ms
                 received = True
                 self.reaction_timer.start()           
                 break
             if self.watchdog is not None and self.watchdog.exceed():
                 self.watchdogExpired()
-            timeout -= 0.01
+            timeout -= 1
         return received
 
             

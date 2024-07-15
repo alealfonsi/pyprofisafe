@@ -55,6 +55,8 @@ class TestSlaveProfisafe(TestCase):
             #    r = self.slave.receive(15)
             #except Exception as e:
             #    print(e)
+            #FUNZIONA BENISSIMO CON IL BREAKPOINT, SENZA SPESSO SI ROMPE IN LETTURA,
+            # AGGIUSTARE CON DELLE SLEEP?
             r = self.slave.receive(150)
             if not r:
                 raise SlaveException("Did't receive anything!")
@@ -73,7 +75,7 @@ class TestSlaveProfisafe(TestCase):
                  FdlTelegram.FC_OK,
                  out_du
             )
-            control_byte = ControlByteDevice(ControlByteDevice.TOGGLE_D)
+            control_byte = ControlByteDevice.TOGGLE_D
             crc = b'\xab' * 3
             send_telegram = ProfiSafeTelegram_Con(payload, control_byte, crc)
             self.slave.send(send_telegram)
