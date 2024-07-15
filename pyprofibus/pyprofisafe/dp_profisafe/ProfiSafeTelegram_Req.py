@@ -8,7 +8,7 @@ class ProfiSafeTelegram_Req(ProfiSafeTelegram):
     
     def __init__(self, payload, control_byte, crc):
         super().__init__(crc)
-        self.control_byte = control_byte
+        self.control_byte = ControlByteHost(control_byte)
         if (
             DpTelegram_DataExchange_Req.checkType(payload)
             or DpTelegram_SlaveDiag_Req.checkType(payload)

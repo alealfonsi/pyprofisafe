@@ -1,6 +1,7 @@
 from pyprofibus.dp.dp import DpTelegram_GlobalControl, DpTransceiver
 from pyprofibus.fieldbus_data_link.fdl import FdlFCB
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
+from pyprofibus.pyprofisafe.dp_profisafe.ControlByteHost import ControlByteHost
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram import ProfiSafeTelegram
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_Con import ProfiSafeTelegram_Con
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_GlobalControl import ProfiSafeTelegram_GlobalControl
