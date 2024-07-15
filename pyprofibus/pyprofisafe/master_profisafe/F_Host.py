@@ -109,8 +109,7 @@ class F_Host(SimpleMaster):
                             da=slave.slaveDesc.slaveAddr,
                             sa=self.masterAddr,
                             du=toSlaveData)
-                        control_byte = ControlByteHost(
-                            ControlByteHost.TOGGLE_H + ControlByteHost.LOOPBACK)
+                        control_byte = ControlByteHost.TOGGLE_H + ControlByteHost.LOOPBACK
                         crc = b'\xab' * 3
                         ok = self._send(slave,
                                      telegram=ProfiSafeTelegram_Req(payload, control_byte, crc),
@@ -159,9 +158,9 @@ class F_Host(SimpleMaster):
         payload.groupSelect = 0x00 #all slaves
         globCtl = ProfiSafeTelegram_GlobalControl(
             payload,
-            ControlByteHost(ControlByteHost.OPERATOR_ACK_REQUESTED +
-                            ControlByteHost.ACTIVATE_FV +
-                            ControlByteHost.LOOPBACK),
+            ControlByteHost.OPERATOR_ACK_REQUESTED +
+            ControlByteHost.ACTIVATE_FV +
+            ControlByteHost.LOOPBACK,
             b'\xab' * 3)
         print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
 		 			% (globCtl.__class__, time.time(), globCtl))
@@ -239,7 +238,7 @@ class F_Host(SimpleMaster):
                                              da=slave.slaveDesc.slaveAddr,
                                              sa=self.masterAddr,
                                              du=bytearray((0x00, 0x00)))
-                        control_byte = ControlByteHost(ControlByteHost.OPERATOR_ACK_REQUESTED +
+                        control_byte = (ControlByteHost.OPERATOR_ACK_REQUESTED +
                             ControlByteHost.ACTIVATE_FV +
                             ControlByteHost.LOOPBACK)
                         crc = b'\xab' * 3
