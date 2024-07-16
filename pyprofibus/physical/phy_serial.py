@@ -9,6 +9,7 @@
 #
 
 from __future__ import division, absolute_import, print_function, unicode_literals
+import time
 from pyprofibus.compat import *
 
 from pyprofibus.physical.phy import *
@@ -125,9 +126,11 @@ class CpPhySerial(CpPhy):
 			if timeout > 0.0 and monotonic_time() >= timeoutStamp:
 				return None
 
+
 		try:
 			rxBufLen = len(rxBuf)
 			while True:
+				time.sleep(0.05) #####
 				if rxBufLen < 1:
 					rxBuf.extend(ser.read(1))
 				elif rxBufLen < 3:

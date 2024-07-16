@@ -55,8 +55,6 @@ class TestSlaveProfisafe(TestCase):
             #    r = self.slave.receive(15)
             #except Exception as e:
             #    print(e)
-            #FUNZIONA BENISSIMO CON IL BREAKPOINT, SENZA SPESSO SI ROMPE IN LETTURA,
-            # AGGIUSTARE CON DELLE SLEEP?
             r = self.slave.receive(150)
             if not r:
                 raise SlaveException("Did't receive anything!")

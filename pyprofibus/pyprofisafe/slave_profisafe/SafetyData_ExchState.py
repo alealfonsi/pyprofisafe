@@ -1,5 +1,6 @@
 import time
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Req, DpTelegram_GlobalControl
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 from pyprofibus.pyprofisafe.dp_profisafe.ControlByteHost import ControlByteHost
 from pyprofibus.pyprofisafe.slave_profisafe.FailSafeProfiSafeState import FailSafeProfiSafeState
