@@ -68,7 +68,6 @@ class TestMasterProfisafe(TestCase):
                 slaveDesc.setMasterOutData(self.outData[slaveDesc.name])
             # Run slave state machines.
             handledSlaveDesc = self.master.run()
-            time.sleep(1)
             # Get the in-data (receive)
             if handledSlaveDesc:
                 inData = handledSlaveDesc.getMasterInData()
