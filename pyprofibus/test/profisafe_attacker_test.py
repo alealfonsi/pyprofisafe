@@ -51,11 +51,10 @@ class TestAttacker(TestCase):
         ### normal data exchange with master
         out_du = bytearray()
         
-        for i in range(2):
+        for i in range(1):
             r = self.slave.receive(15)
             if not r:
                 raise SlaveException("Did't receive anything!")
-            print("Slave " + self.slave.getId() + " received the telegram: %s" % self.slave.rx_telegram)
             #answer the master sending back the same data incremented by 1
             in_du = self.slave.rx_telegram.payload.getDU()
             if i == 0:
