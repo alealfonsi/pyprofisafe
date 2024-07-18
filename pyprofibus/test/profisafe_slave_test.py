@@ -34,7 +34,7 @@ class TestSlaveProfisafe(TestCase):
             #slave.setState(Wait_PrmState(slave))
             #parameterization
             cls.slave.setAddress(0)
-            cls.slave.setParameters(True, 500000, 100, False, False, 0, 111, "victim")
+            cls.slave.setParameters(True, 4000, 100, False, False, 0, 111, "victim")
             cls.slave.setState(SafetyData_ExchState())
 
             
@@ -50,12 +50,11 @@ class TestSlaveProfisafe(TestCase):
         out_du = bytearray()
         
         #run
-        for i in range(4):
-            #try:
-            #    r = self.slave.receive(15)
-            #except Exception as e:
-            #    print(e)
-            r = self.slave.receive(150)
+        for i in range(400):
+            try:
+                r = self.slave.receive(30)
+            except Exception as e:
+                print(e)
             if not r:
                 raise SlaveException("Did't receive anything!")
             print("Slave " + self.slave.getId() + " received the telegram: %s" % self.slave.rx_telegram)
@@ -67,6 +66,8 @@ class TestSlaveProfisafe(TestCase):
             else:
                 out_du[0] = in_du[0] + 1
                 out_du[1] = in_du[1] + 1
+            if out_du[0] == 8 and out_du[1] == 8:
+                break
             payload = DpTelegram_DataExchange_Con(
                  self.slave.getMasterAddress(),
                  self.slave.address,
