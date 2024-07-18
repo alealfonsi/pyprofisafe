@@ -72,7 +72,7 @@ class TestMasterProfisafe(TestCase):
             if handledSlaveDesc:
                 inData = handledSlaveDesc.getMasterInData()
                 if inData is not None:
-                    if inData[0] == 7 and inData[1] == 7:
+                    if inData[0] == 9 and inData[1] == 9:
                          break
                     self.outData[handledSlaveDesc.name][0] = inData[0] + 1
                     self.outData[handledSlaveDesc.name][1] = inData[1] + 1
