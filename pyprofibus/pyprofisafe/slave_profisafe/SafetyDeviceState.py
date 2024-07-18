@@ -1,4 +1,5 @@
 import time
+from pyprofibus.fieldbus_data_link.fdl import FdlTelegram
 from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 from pyprofibus.slave.SlaveState import SlaveState
 
@@ -17,7 +18,7 @@ class SafetyDeviceState(SlaveState):
                 if self.checkTelegram(slave, telegram):
                     slave.resetWatchdog()
                     print("""XXX| Slave %s in state %s received frame of type %s at time: %d\n
-                      XXX| %s""" % (slave.getId(), self.__class__, telegram.__class__, time.time(), telegram))
+                      XXX| %s""" % (slave.getId(), self.__class__, telegram.__class__, time.time(), telegram.payload))
                     return True
         else:
             if telegram:

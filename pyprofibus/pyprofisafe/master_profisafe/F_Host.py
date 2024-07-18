@@ -26,7 +26,7 @@ class F_Host(SimpleMaster):
         try:
             transceiver = self.ps_trans
             print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
-                    % (telegram.__class__, time.time(), telegram))
+                    % (telegram.__class__, time.time(), telegram.payload))
             transceiver.send(telegram)
         except (ProfibusError, ProfiSafeError) as e:
             slave.pendingReq = None
@@ -133,7 +133,7 @@ class F_Host(SimpleMaster):
 
         if ok and telegram:
             print("XXX| Master received frame of type %s at time: %d\nXXX| %s" 
-                  % (telegram.__class__, time.time(), telegram))
+                  % (telegram.__class__, time.time(), telegram.payload))
             if telegram.payload.da == self.masterAddr:
                 if telegram.payload.sa in self._slaveStates:
                     slave = self._slaveStates[telegram.payload.sa]
@@ -164,7 +164,7 @@ class F_Host(SimpleMaster):
             ControlByteHost.LOOPBACK,
             b'\xab' * 3)
         print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
-		 			% (globCtl.__class__, time.time(), globCtl))
+		 			% (globCtl.__class__, time.time(), globCtl.payload))
         self.ps_trans.send(telegram = globCtl)
         
         for s in self._DpMaster__slaveDescsList:
@@ -282,7 +282,7 @@ class F_Host(SimpleMaster):
         crc = b'\xab' * 3
         globCtl = ProfiSafeTelegram_GlobalControl(payload, control_byte, crc)
         print("XXX| Master sends frame of type %s at time: %d\nXXX| %s" 
-		 			% (globCtl.__class__, time.time(), globCtl))
+		 			% (globCtl.__class__, time.time(), globCtl.payload))
         self.ps_trans.send(telegram = globCtl)
         
         for s in self._DpMaster__slaveDescsList:

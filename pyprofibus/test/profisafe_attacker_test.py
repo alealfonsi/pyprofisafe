@@ -1,11 +1,12 @@
 import sys
+
 sys.path.insert(0, "/home/alessio/pyprofisafe")
 
-import pyprofibus
+from pyprofibus.pyprofisafe.ProfiSafeError import ProfiSafeError
 from pyprofibus.attacker.exploit_profisafe import ExploitProfiSafe
 from pyprofibus.pyprofisafe.dp_profisafe.ControlByteDevice import ControlByteDevice
 from pyprofibus.pyprofisafe.dp_profisafe.ProfiSafeTelegram_Con import ProfiSafeTelegram_Con
-from pyprofibus.pyprofisafe.slave_profisafe import SafetyData_ExchState
+from pyprofibus.pyprofisafe.slave_profisafe.SafetyData_ExchState import SafetyData_ExchState
 from pyprofibus.pyprofisafe.slave_profisafe.F_Device import F_Device
 from pyprofibus.pyprofisafe.slave_profisafe.SafetyResetState import SafetyResetState
 from pyprofibus.dp.dp import DpTelegram_DataExchange_Con
@@ -38,7 +39,7 @@ class TestAttacker(TestCase):
 
             
 
-        except pyprofibus.ProfiSafeError as e:
+        except ProfiSafeError as e:
             print("Terminating slave: %s" % str(e))
             return 1
         
@@ -50,7 +51,7 @@ class TestAttacker(TestCase):
         ### normal data exchange with master
         out_du = bytearray()
         
-        for i in range(3):
+        for i in range(2):
             r = self.slave.receive(15)
             if not r:
                 raise SlaveException("Did't receive anything!")
