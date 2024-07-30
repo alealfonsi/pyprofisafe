@@ -70,13 +70,13 @@ class TestMaster(TestCase):
 
                 # Run slave state machines.
                 handledSlaveDesc = self.master.run()
-                time.sleep(0.2)
+                time.sleep(0.05)
 
                 # Get the in-data (receive)
                 if handledSlaveDesc:
                     inData = handledSlaveDesc.getMasterInData()
                     if inData is not None:
-                        if inData[0] == 21 and inData[1] == 21:
+                        if inData[0] == 111 and inData[1] == 111:
                              break
                         self.outData[handledSlaveDesc.name][0] = inData[0] + 1
                         self.outData[handledSlaveDesc.name][1] = inData[1] + 1
