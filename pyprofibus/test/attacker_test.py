@@ -31,10 +31,10 @@ class TestAttacker(TestCase):
             cls.slave.setState(ResetState())
             #slave.setState(Wait_PrmState(slave))
             #parameterization
-            cls.slave.setAddress(1)
+            cls.slave.setAddress(2)
             cls.slave.setParameters(False, 30000, 100, False, False, 0, 111, "attacker")
             cls.slave.setState(Data_ExchState())
-            cls.attacker = ExploitProfibus(cls.slave, 0, 0xA)
+            cls.attacker = ExploitProfibus(cls.slave, 1, 0xA)
 
             
 
