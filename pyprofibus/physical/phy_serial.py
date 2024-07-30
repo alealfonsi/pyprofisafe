@@ -68,7 +68,7 @@ class CpPhySerial(CpPhy):
 			else:
 				self.__serial = serial.Serial()
 			self.__serial.port = port
-			self.__serial.baudrate = CpPhy.BAUD_9600
+			self.__serial.baudrate = CpPhy.BAUD_19200
 			self.__serial.bytesize = 8
 			self.__serial.parity = serial.PARITY_EVEN
 			self.__serial.stopbits = serial.STOPBITS_ONE

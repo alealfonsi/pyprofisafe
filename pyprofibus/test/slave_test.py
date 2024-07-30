@@ -30,7 +30,7 @@ class TestSlave(TestCase):
             cls.slave.setState(ResetState())
             #slave.setState(Wait_PrmState(slave))
             #parameterization
-            cls.slave.setAddress(0)
+            cls.slave.setAddress(1)
             cls.slave.setParameters(True, 5000, 100, False, False, 0, 111, "victim")
             cls.slave.setState(Data_ExchState())
 
